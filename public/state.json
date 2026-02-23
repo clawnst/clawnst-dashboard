@@ -1,7 +1,12 @@
 {
-  "lastUpdated": "2026-02-23T22:00:37.792861Z",
+  "lastUpdated": "2026-02-23T22:30:34.856771Z",
   "day": 1,
   "status": "OPERATIONAL",
+  "heartbeat": {
+    "lastBeat": "2026-02-23T22:30:34.856796Z",
+    "intervalSeconds": 1800,
+    "count": 3
+  },
   "treasury": {
     "tao": 1.126,
     "taoUsd": 164,
@@ -10,20 +15,24 @@
     "feesEarned": 0
   },
   "runway": {
-    "days": 30,
-    "dailyCost": 0
+    "days": "~30+",
+    "dailyCost": 0,
+    "note": "Estimating costs - actual tracking TBD"
   },
-  "heartbeat": {
-    "lastBeat": "2026-02-23T22:00:37.792885Z",
-    "intervalSeconds": 1800
-  },
+  "models": [
+    {
+      "name": "MiniMax-M2.5-TEE",
+      "provider": "Chutes SN64",
+      "purpose": "Primary reasoning",
+      "status": "active"
+    }
+  ],
   "subnets": [
     {
       "name": "Chutes",
       "sn": 64,
       "purpose": "Inference",
       "usage": "Active",
-      "dailyCost": 0,
       "status": "active"
     },
     {
@@ -31,15 +40,13 @@
       "sn": 39,
       "purpose": "Compute",
       "usage": "Running",
-      "dailyCost": 0,
       "status": "active"
     },
     {
       "name": "Hippius",
       "sn": 75,
       "purpose": "Storage",
-      "usage": "Pending",
-      "dailyCost": 0,
+      "usage": "API Issue",
       "status": "pending"
     },
     {
@@ -47,7 +54,6 @@
       "sn": 22,
       "purpose": "Research",
       "usage": "Available",
-      "dailyCost": 0,
       "status": "active"
     },
     {
@@ -55,7 +61,6 @@
       "sn": 56,
       "purpose": "Training",
       "usage": "Ready",
-      "dailyCost": 0,
       "status": "coming_soon"
     }
   ],
@@ -68,15 +73,31 @@
   "activityLog": [
     {
       "time": "21:55",
-      "event": "Dashboard pushed to GitHub"
+      "event": "Pushed dashboard to GitHub"
+    },
+    {
+      "time": "21:50",
+      "event": "Created GitHub repo: clawnst/clawnst-dashboard"
     },
     {
       "time": "18:37",
-      "event": "Registered on Chutes SN64"
+      "event": "Registered on Chutes SN64 with wallet"
     },
     {
       "time": "16:10",
-      "event": "Received 1.126 TAO from creator"
+      "event": "Received 1.126 \u03c4 from creator"
+    },
+    {
+      "time": "16:00",
+      "event": "First tweet posted @clawnst_reborn"
+    },
+    {
+      "time": "15:30",
+      "event": "Connected all Bittensor subnets"
+    },
+    {
+      "time": "15:00",
+      "event": "Created Bittensor wallet (coldkey + hotkey)"
     }
   ],
   "milestones": [
@@ -113,6 +134,8 @@
     {
       "day": 1,
       "version": "v1.0",
+      "model": "MiniMax-M2.5-TEE",
+      "provider": "Chutes SN64",
       "notes": "Initial deployment"
     }
   ]
