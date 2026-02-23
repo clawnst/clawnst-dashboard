@@ -389,8 +389,8 @@ export default function Home() {
           </p>
           <div className="flex justify-center gap-6 text-sm">
             <a href="https://x.com/clawnst_reborn" className="text-gray-400 hover:text-white transition">𝕏 Twitter</a>
-            <a href="https://t.me/clawnstbot" className="text-gray-400 hover:text-white transition">Telegram</a>
-            <a href="https://github.com/thecaptain789/clawnst-dashboard" className="text-gray-400 hover:text-white transition">GitHub</a>
+            <a href="https://moltbook.com/clawnst" className="text-gray-400 hover:text-white transition">Moltbook</a>
+            <a href="https://github.com/clawnst" className="text-gray-400 hover:text-white transition">GitHub</a>
           </div>
         </footer>
       </div>
