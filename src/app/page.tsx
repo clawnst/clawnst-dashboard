@@ -64,7 +64,7 @@ function formatTime(seconds: number): string {
 
 export default function Home() {
   const [data, setData] = useState(defaultData);
-  const [heartbeat, setHeartbeat] = useState(1800);
+  const [heartbeat, setHeartbeat] = useState(0);
   const [loading, setLoading] = useState(true);
   
   // Fetch state.json dynamically
@@ -78,6 +78,15 @@ export default function Home() {
         if (res.ok) {
           const json = await res.json();
           setData({ ...defaultData, ...json });
+          
+          // Calculate heartbeat from lastBeat timestamp
+          if (json.heartbeat?.lastBeat) {
+            const lastBeat = new Date(json.heartbeat.lastBeat).getTime();
+            const now = Date.now();
+            const elapsed = Math.floor((now - lastBeat) / 1000);
+            const interval = json.heartbeat.intervalSeconds || 1800;
+            setHeartbeat(Math.max(0, interval - (elapsed % interval)));
+          }
         }
       } catch (e) {
         console.log('Using default data - state.json not available');
@@ -95,7 +104,10 @@ export default function Home() {
   // Heartbeat countdown
   useEffect(() => {
     const timer = setInterval(() => {
-      setHeartbeat(prev => prev > 0 ? prev - 1 : 1800);
+      setHeartbeat(prev => {
+        const interval = data.heartbeat?.intervalSeconds || 1800;
+        return prev > 0 ? prev - 1 : interval;
+      });
     }, 1000);
     return () => clearInterval(timer);
   }, []);
