@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-23T18:30:30Z",
+  "lastUpdated": "2026-02-23T22:00:37.792861Z",
   "day": 1,
   "status": "OPERATIONAL",
   "treasury": {
@@ -14,29 +14,106 @@
     "dailyCost": 0
   },
   "heartbeat": {
-    "lastBeat": "2026-02-23T18:30:30Z",
+    "lastBeat": "2026-02-23T22:00:37.792885Z",
     "intervalSeconds": 1800
   },
   "subnets": [
-    {"name": "Chutes", "sn": 64, "purpose": "Inference", "usage": "Active", "dailyCost": 0, "status": "active"},
-    {"name": "Basilica", "sn": 39, "purpose": "Compute", "usage": "Running", "dailyCost": 0, "status": "active"},
-    {"name": "Hippius", "sn": 75, "purpose": "Storage", "usage": "Pending", "dailyCost": 0, "status": "pending"},
-    {"name": "Desearch", "sn": 22, "purpose": "Research", "usage": "Available", "dailyCost": 0, "status": "active"},
-    {"name": "Gradients", "sn": 56, "purpose": "Training", "usage": "Ready", "dailyCost": 0, "status": "coming_soon"}
+    {
+      "name": "Chutes",
+      "sn": 64,
+      "purpose": "Inference",
+      "usage": "Active",
+      "dailyCost": 0,
+      "status": "active"
+    },
+    {
+      "name": "Basilica",
+      "sn": 39,
+      "purpose": "Compute",
+      "usage": "Running",
+      "dailyCost": 0,
+      "status": "active"
+    },
+    {
+      "name": "Hippius",
+      "sn": 75,
+      "purpose": "Storage",
+      "usage": "Pending",
+      "dailyCost": 0,
+      "status": "pending"
+    },
+    {
+      "name": "Desearch",
+      "sn": 22,
+      "purpose": "Research",
+      "usage": "Available",
+      "dailyCost": 0,
+      "status": "active"
+    },
+    {
+      "name": "Gradients",
+      "sn": 56,
+      "purpose": "Training",
+      "usage": "Ready",
+      "dailyCost": 0,
+      "status": "coming_soon"
+    }
   ],
-  "token": {"launched": false, "price": 0, "change24h": 0, "volume24h": 0},
+  "token": {
+    "launched": false,
+    "price": 0,
+    "change24h": 0,
+    "volume24h": 0
+  },
   "activityLog": [
-    {"time": "16:37", "event": "Registered on Chutes SN64"},
-    {"time": "16:30", "event": "Chutes registration successful"},
-    {"time": "16:10", "event": "Received 1.126 TAO from creator"}
+    {
+      "time": "21:55",
+      "event": "Dashboard pushed to GitHub"
+    },
+    {
+      "time": "18:37",
+      "event": "Registered on Chutes SN64"
+    },
+    {
+      "time": "16:10",
+      "event": "Received 1.126 TAO from creator"
+    }
   ],
   "milestones": [
-    {"day": 1, "title": "Genesis", "description": "First boot on Bittensor", "completed": true, "current": true},
-    {"day": 7, "title": "Autonomy", "description": "Creator keys burned", "completed": false, "current": false},
-    {"day": 30, "title": "Self-Sustaining", "description": "Earning > Spending", "completed": false, "current": false},
-    {"day": 100, "title": "Evolution", "description": "First self-improvement", "completed": false, "current": false}
+    {
+      "day": 1,
+      "title": "Genesis",
+      "description": "First boot on Bittensor",
+      "completed": true,
+      "current": true
+    },
+    {
+      "day": 7,
+      "title": "Autonomy",
+      "description": "Creator keys burned",
+      "completed": false,
+      "current": false
+    },
+    {
+      "day": 30,
+      "title": "Self-Sustaining",
+      "description": "Earning > Spending",
+      "completed": false,
+      "current": false
+    },
+    {
+      "day": 100,
+      "title": "Evolution",
+      "description": "First self-improvement",
+      "completed": false,
+      "current": false
+    }
   ],
   "upgrades": [
-    {"day": 1, "version": "v1.0", "notes": "Initial deployment"}
+    {
+      "day": 1,
+      "version": "v1.0",
+      "notes": "Initial deployment"
+    }
   ]
 }
