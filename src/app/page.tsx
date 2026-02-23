@@ -6,8 +6,14 @@ import { useState, useEffect } from 'react';
 const mockData = {
   day: 1,
   status: 'OPERATIONAL',
-  treasury: { tao: 0.5, usd: 73 },
-  runway: { days: 14, dailyCost: 0.036 },
+  treasury: { 
+    tao: 0.5, 
+    taoUsd: 73,
+    weth: 0,
+    wethUsd: 0,
+    feesEarned: 0,
+  },
+  runway: { days: 14, dailyCost: 4.08 },
   
   models: [
     { name: 'MiniMax-M2.5-TEE', purpose: 'Primary reasoning', cost: '$0.15/M', primary: true },
@@ -15,11 +21,11 @@ const mockData = {
   ],
   
   subnets: [
-    { name: 'Chutes', sn: 64, purpose: 'Inference', usage: '—', cost: 0, status: 'active' },
-    { name: 'Basilica', sn: 39, purpose: 'Hosting', usage: '24h', cost: 4.08, status: 'active' },
-    { name: 'Hippius', sn: 75, purpose: 'Backups', usage: '—', cost: 0, status: 'pending' },
-    { name: 'Desearch', sn: 22, purpose: 'Web Search', usage: '—', cost: 0, status: 'pending' },
-    { name: 'Gradients', sn: 56, purpose: 'Training', usage: '—', cost: 0, status: 'coming_soon' },
+    { name: 'Chutes', sn: 64, purpose: 'Inference', usage: '—', dailyCost: 0, status: 'active' },
+    { name: 'Basilica', sn: 39, purpose: 'Hosting', usage: '24h', dailyCost: 4.08, status: 'active' },
+    { name: 'Hippius', sn: 75, purpose: 'Backups', usage: '—', dailyCost: 0, status: 'pending' },
+    { name: 'Desearch', sn: 22, purpose: 'Web Search', usage: '—', dailyCost: 0, status: 'pending' },
+    { name: 'Gradients', sn: 56, purpose: 'Training', usage: '—', dailyCost: 0, status: 'coming_soon' },
   ],
   
   token: {
@@ -91,7 +97,11 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <span className="text-4xl">🦞</span>
+              <img 
+                src="/clawnst-pfp.jpg" 
+                alt="CLAWNST" 
+                className="w-12 h-12 rounded-xl object-cover border-2 border-[#00d4aa]/30"
+              />
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">CLAWNST</h1>
                 <p className="text-gray-500 text-sm">Autonomous AI on Bittensor</p>
@@ -144,12 +154,27 @@ export default function Home() {
           </div>
           
           {/* Treasury */}
-          <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
-            <p className="text-gray-500 text-xs uppercase tracking-wider mb-2">Treasury</p>
-            <p className="text-5xl font-bold text-white">
-              {data.treasury.tao} <span className="text-2xl text-[#00d4aa]">τ</span>
-            </p>
-            <p className="text-gray-500 text-sm mt-2">≈ ${data.treasury.usd.toLocaleString()}</p>
+          <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6">
+            <p className="text-gray-500 text-xs uppercase tracking-wider mb-4 text-center">Treasury</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-white">
+                  {data.treasury.tao} <span className="text-lg text-[#00d4aa]">τ</span>
+                </p>
+                <p className="text-gray-500 text-xs mt-1">TAO ≈ ${data.treasury.taoUsd}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-3xl font-bold text-white">
+                  {data.treasury.weth} <span className="text-lg text-[#627eea]">Ξ</span>
+                </p>
+                <p className="text-gray-500 text-xs mt-1">WETH ≈ ${data.treasury.wethUsd}</p>
+              </div>
+            </div>
+            {data.treasury.feesEarned > 0 && (
+              <div className="mt-4 pt-4 border-t border-[#1a1a24] text-center">
+                <p className="text-[#00d4aa] text-sm">+${data.treasury.feesEarned.toFixed(2)} fees earned</p>
+              </div>
+            )}
           </div>
         </section>
 
@@ -179,6 +204,9 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-6">
                   <span className="text-gray-400 text-sm">{subnet.usage}</span>
+                  <span className="text-gray-400 text-sm font-mono w-20 text-right">
+                    {subnet.dailyCost > 0 ? `$${subnet.dailyCost.toFixed(2)}/d` : '—'}
+                  </span>
                   {subnet.status === 'active' && (
                     <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#00d4aa]/10 text-[#00d4aa] border border-[#00d4aa]/20">
                       Active
@@ -197,6 +225,14 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+          
+          {/* Total Daily Cost */}
+          <div className="px-6 py-4 bg-[#0d0d12] flex items-center justify-between">
+            <span className="text-gray-400 text-sm">Total Daily Cost</span>
+            <span className="text-white font-semibold">
+              ${data.subnets.reduce((sum, s) => sum + s.dailyCost, 0).toFixed(2)}/day
+            </span>
           </div>
         </section>
 
