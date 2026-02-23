@@ -2,18 +2,18 @@
 
 import { useState, useEffect } from 'react';
 
-// Mock data - will be replaced with dynamic state.json fetch
-const mockData = {
+// Default data as fallback when state.json is not available
+const defaultData = {
   day: 1,
   status: 'OPERATIONAL',
   treasury: { 
-    tao: 0.5, 
-    taoUsd: 73,
+    tao: 0, 
+    taoUsd: 0,
     weth: 0,
     wethUsd: 0,
     feesEarned: 0,
   },
-  runway: { days: 14, dailyCost: 4.08 },
+  runway: { days: 0, dailyCost: 0 },
   
   models: [
     { name: 'MiniMax-M2.5-TEE', purpose: 'Primary reasoning', cost: '$0.15/M', primary: true },
@@ -22,7 +22,7 @@ const mockData = {
   
   subnets: [
     { name: 'Chutes', sn: 64, purpose: 'Inference', usage: '—', dailyCost: 0, status: 'active' },
-    { name: 'Basilica', sn: 39, purpose: 'Hosting', usage: '24h', dailyCost: 4.08, status: 'active' },
+    { name: 'Basilica', sn: 39, purpose: 'Hosting', usage: '24h', dailyCost: 0, status: 'active' },
     { name: 'Hippius', sn: 75, purpose: 'Backups', usage: '—', dailyCost: 0, status: 'pending' },
     { name: 'Desearch', sn: 22, purpose: 'Web Search', usage: '—', dailyCost: 0, status: 'pending' },
     { name: 'Gradients', sn: 56, purpose: 'Training', usage: '—', dailyCost: 0, status: 'coming_soon' },
@@ -38,9 +38,7 @@ const mockData = {
   nextHeartbeat: 1800,
   
   activityLog: [
-    { time: '16:40', event: 'First boot complete. Identity loaded.' },
-    { time: '16:35', event: 'Connected to Telegram.' },
-    { time: '16:30', event: 'Deployed on Basilica SN39.' },
+    { time: '00:00', event: 'Waiting for first heartbeat...' },
   ],
   
   milestones: [
@@ -65,9 +63,36 @@ function formatTime(seconds: number): string {
 }
 
 export default function Home() {
-  const [data] = useState(mockData);
-  const [heartbeat, setHeartbeat] = useState(data.nextHeartbeat);
+  const [data, setData] = useState(defaultData);
+  const [heartbeat, setHeartbeat] = useState(1800);
+  const [loading, setLoading] = useState(true);
   
+  // Fetch state.json dynamically
+  useEffect(() => {
+    async function fetchState() {
+      try {
+        const res = await fetch('/state.json', { 
+          cache: 'no-store',
+          headers: { 'Pragma': 'no-cache' }
+        });
+        if (res.ok) {
+          const json = await res.json();
+          setData({ ...defaultData, ...json });
+        }
+      } catch (e) {
+        console.log('Using default data - state.json not available');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchState();
+    
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchState, 30000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  // Heartbeat countdown
   useEffect(() => {
     const timer = setInterval(() => {
       setHeartbeat(prev => prev > 0 ? prev - 1 : 1800);
