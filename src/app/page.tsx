@@ -96,7 +96,7 @@ const BITENSOR_ADDRESS = '5CojToxGcszJEa9xwHWz1MgMb4Yij3GZevCqHB9hDLREXGKb';
 
 export default function Home() {
   const [data, setData] = useState(defaultData);
-  const [heartbeatCountdown, setHeartbeatCountdown] = useState(1800); // 30 min countdown
+  const [heartbeatCountdown, setHeartbeatCountdown] = useState(0); // Will calculate on mount
   const [survivalCountdown, setSurvivalCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [survivalTime, setSurvivalTime] = useState(0); // Total seconds remaining
   const [loading, setLoading] = useState(true);
@@ -120,9 +120,21 @@ export default function Home() {
           const json = await res.json();
           setData({ ...defaultData, ...json });
           
-          // Reset heartbeat to 30 min interval
-          const interval = json.heartbeat?.intervalSeconds || 1800;
-          setHeartbeatCountdown(interval);
+          // Calculate time until next heartbeat (every 30 min at :00 and :30)
+          const now = new Date();
+          const minutes = now.getMinutes();
+          const seconds = now.getSeconds();
+          
+          // Next heartbeat at :00 or :30
+          let nextHeartbeatMinutes = 0;
+          if (minutes < 30) {
+            nextHeartbeatMinutes = 30;
+          } else {
+            nextHeartbeatMinutes = 60;
+          }
+          
+          const secondsUntilNext = (nextHeartbeatMinutes - minutes) * 60 - seconds;
+          setHeartbeatCountdown(secondsUntilNext);
         }
       } catch (e) {
         console.log('Using default data - state.json not available');
@@ -187,14 +199,26 @@ export default function Home() {
     return () => { clearInterval(interval); clearInterval(priceInterval); clearInterval(balanceInterval); };
   }, []);
   
-  // Heartbeat - countdown every 30 minutes
+  // Heartbeat - countdown to next 30-min slot
   useEffect(() => {
-    const timer = setInterval(() => {
-      setHeartbeatCountdown(prev => {
-        if (prev <= 0) return 1800; // Reset to 30 min after each heartbeat
-        return prev - 1;
-      });
-    }, 1000);
+    const updateHeartbeat = () => {
+      const now = new Date();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      
+      let nextHeartbeatMinutes = 0;
+      if (minutes < 30) {
+        nextHeartbeatMinutes = 30;
+      } else {
+        nextHeartbeatMinutes = 60;
+      }
+      
+      const secondsUntilNext = (nextHeartbeatMinutes - minutes) * 60 - seconds;
+      setHeartbeatCountdown(secondsUntilNext);
+    };
+    
+    updateHeartbeat();
+    const timer = setInterval(updateHeartbeat, 1000);
     return () => clearInterval(timer);
   }, []);
 
