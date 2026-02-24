@@ -172,7 +172,6 @@ export default function Home() {
     }
     
     fetchTauPrice();
-    fetchTauBalance();
     calculateDayNumber();
     
     // Refresh every hour (price) and every 5 min (state)
