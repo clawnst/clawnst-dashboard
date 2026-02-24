@@ -121,9 +121,18 @@ export default function Home() {
           setData({ ...defaultData, ...json });
           
           // Get last heartbeat timestamp (time since last heartbeat response)
+          // If no recent heartbeat or old data, use current time
+          const now = Date.now();
           if (json.heartbeat?.lastBeat) {
             const lastBeat = new Date(json.heartbeat.lastBeat).getTime();
-            setLastHeartbeatAt(lastBeat);
+            // If last beat was > 1 hour ago, assume we're waiting for first one
+            if (now - lastBeat < 3600000) {
+              setLastHeartbeatAt(lastBeat);
+            } else {
+              setLastHeartbeatAt(now); // Start fresh
+            }
+          } else {
+            setLastHeartbeatAt(now); // No data, start fresh
           }
         }
       } catch (e) {
@@ -193,7 +202,14 @@ export default function Home() {
   useEffect(() => {
     const updateHeartbeat = () => {
       const now = Date.now();
-      const elapsed = Math.floor((now - lastHeartbeatAt) / 1000);
+      let elapsed = Math.floor((now - lastHeartbeatAt) / 1000);
+      
+      // If heartbeat is older than 1 hour, show "waiting..." instead
+      if (elapsed > 3600) {
+        setHeartbeatDisplay({ minutes: 0, seconds: 0, status: 'waiting' });
+        return;
+      }
+      
       const minutes = Math.floor(elapsed / 60);
       const seconds = elapsed % 60;
       
