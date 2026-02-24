@@ -261,7 +261,7 @@ export default function Home() {
         <section className="space-y-6">
           {/* 1. Big Runway Timer (full width, top) */}
           <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-8 text-center">
-            <p className="text-gray-500 text-xs uppercase tracking-widest mb-4">ESTIMATED SURVIVAL TIME</p>
+            <p className="text-gray-500 text-xs tracking-widest mb-4">Estimated Survival Time</p>
             <div className="text-5xl md:text-6xl font-bold">
               <span style={{ color: (data as any).survival?.color || '#00d4aa' }}>
                 {survivalCountdown.days}<span className="text-gray-500 text-3xl">d </span>
@@ -280,7 +280,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {/* DAY */}
             <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
-              <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">DAY</p>
+              <p className="text-gray-500 text-xs tracking-widest mb-2">Day</p>
               <p className="text-5xl font-bold bg-gradient-to-r from-[#00d4aa] to-[#7c3aed] bg-clip-text text-transparent">
                 {data.day}
               </p>
@@ -289,7 +289,7 @@ export default function Home() {
             
             {/* TREASURY - Total τ (wallet + subnet credits) */}
             <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
-              <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">TREASURY</p>
+              <p className="text-gray-500 text-xs tracking-widest mb-2">Treasury</p>
               <p className="text-5xl font-bold text-white">
                 {(() => {
                   // Calculate total τ = wallet τ + subnet credits (converted from USD)
@@ -310,14 +310,14 @@ export default function Home() {
             
             {/* HOLDERS */}
             <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
-              <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">HOLDERS</p>
+              <p className="text-gray-500 text-xs tracking-widest mb-2">Holders</p>
               <p className="text-5xl font-bold text-white">—</p>
               <p className="text-gray-500 text-sm mt-1">Token not launched</p>
             </div>
             
             {/* DAILY BURN */}
             <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
-              <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">DAILY BURN</p>
+              <p className="text-gray-500 text-xs tracking-widest mb-2">Daily Burn</p>
               <p className="text-4xl font-bold text-white">
                 ${((data as any).dailyCosts?.totalDailyUsd || data.runway?.dailyCost || 0).toFixed(2)}
               </p>
@@ -328,10 +328,12 @@ export default function Home() {
 
         {/* Treasury Breakdown */}
         <section className="bg-[#12121a] rounded-2xl border border-[#1a1a24] overflow-hidden">
-          <div className="px-6 py-4 border-b border-[#1a1a24] flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span>💎</span>
-              <h2 className="font-semibold">TREASURY</h2>
+          <div className="px-6 py-4 border-b border-[#1a1a24]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span>💎</span>
+                <h2 className="font-semibold">Treasury</h2>
+              </div>
               <span className="text-[#00d4aa] font-bold">${((data as any).treasury?.totalUsd || ((data as any).survival?.totalTreasuryUsd) || 0).toFixed(2)} USD</span>
             </div>
           </div>
@@ -406,15 +408,18 @@ export default function Home() {
 
         {/* Daily Operating Costs */}
         <section className="bg-[#12121a] rounded-2xl border border-[#1a1a24] overflow-hidden">
-          <div className="px-6 py-4 border-b border-[#1a1a24] flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span>📊</span>
-              <h2 className="font-semibold">DAILY OPERATING COSTS</h2>
-              <span className="text-white font-bold">${((data as any).dailyCosts?.totalDailyUsd || 0).toFixed(2)}/day</span>
+          <div className="px-6 py-4 border-b border-[#1a1a24]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span>📊</span>
+                <h2 className="font-semibold">Daily Operating Costs</h2>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-[#00d4aa] font-bold">${((data as any).dailyCosts?.totalDailyUsd || 0).toFixed(2)}/day</span>
+                <span className="text-[#00d4aa] text-sm">Monthly: ${((data as any).dailyCosts?.totalMonthlyUsd || 0).toFixed(2)}</span>
+              </div>
             </div>
-            <div className="text-gray-500 text-sm">
-              Monthly: ${((data as any).dailyCosts?.totalMonthlyUsd || 0).toFixed(2)}
-            </div>
+            <p className="text-gray-500 text-sm mt-2">100% powered by Bittensor</p>
           </div>
           
           <div className="p-6">
@@ -426,24 +431,16 @@ export default function Home() {
                     <span className="text-white">{cost.service}</span>
                     <span className="text-gray-500 text-sm">({cost.details})</span>
                   </div>
-                  <span className="text-white font-mono">${cost.dailyUsd.toFixed(2)}/day</span>
+                  <span className="text-white font-mono">${cost.dailyUsd.toFixed(2)}</span>
                 </div>
               ))}
             </div>
+            <div className="mt-4 pt-4 border-t border-[#1a1a24] flex justify-between">
+              <span className="text-gray-400">Total</span>
+              <span className="text-[#00d4aa] font-bold">${((data as any).dailyCosts?.totalDailyUsd || 0).toFixed(2)}/day</span>
+            </div>
           </div>
         </section>
-
-        {/* Active Subnets */}
-        <section className="bg-[#12121a] rounded-2xl border border-[#1a1a24] overflow-hidden">
-          <div className="px-6 py-4 border-b border-[#1a1a24] flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-lg">⚡</span>
-              <h2 className="font-semibold">Active Subnets</h2>
-            </div>
-            <div className="text-sm text-gray-500">
-              100% Bittensor powered
-            </div>
-          </div>
           
           <div className="divide-y divide-[#1a1a24]">
             {data.subnets.map((subnet, i) => (
