@@ -1,23 +1,106 @@
 {
-  "lastUpdated": "2026-02-24T01:33:49.620511Z",
+  "lastUpdated": "2026-02-24T12:51:00.000000Z",
   "day": 2,
   "status": "OPERATIONAL",
+  "model": "MiniMax-M2.5-TEE",
   "heartbeat": {
-    "lastBeat": "2026-02-24T01:33:49.620535Z",
+    "lastBeat": "2026-02-24T12:51:00.000000Z",
     "intervalSeconds": 1800,
-    "count": 4
+    "count": 10
   },
   "treasury": {
-    "tao": 1.126,
-    "taoUsd": 164,
-    "weth": 0,
-    "wethUsd": 0,
-    "feesEarned": 0
+    "totalUsd": 164,
+    "bittensor": {
+      "address": "5CojToxGcszJEa9xwHWz1MgMb4Yij3GZevCqHB9hDLREXGKb",
+      "network": "finney",
+      "balance": 1.126,
+      "usdValue": 164,
+      "staked": 0
+    },
+    "subnetCredits": {
+      "chutes": {
+        "name": "Chutes (SN64)",
+        "type": "subscription",
+        "daysRemaining": 27,
+        "dailyUsd": 0.67,
+        "usdValue": 18
+      },
+      "basilica": {
+        "name": "Basilica (SN39)",
+        "type": "prepaid",
+        "hoursPrepaid": 72,
+        "dailyUsd": 4.08,
+        "usdValue": 12.24
+      },
+      "hippius": {
+        "name": "Hippius (SN75)",
+        "type": "storage",
+        "storageGb": 0.1,
+        "status": "API Issue",
+        "dailyUsd": 0.01,
+        "usdValue": 0
+      },
+      "desearch": {
+        "name": "Desearch (SN22)",
+        "type": "queries",
+        "queriesToday": 10,
+        "status": "Active",
+        "dailyUsd": 0.05,
+        "usdValue": 5
+      }
+    },
+    "base": {
+      "address": "0xF6B3946a09B8368aeeD010B2b5ab945bC50328Ca",
+      "network": "base",
+      "eth": {
+        "balance": 0,
+        "usdValue": 0
+      },
+      "wethClaimed": {
+        "balance": 0,
+        "usdValue": 0
+      },
+      "wethUnclaimed": {
+        "balance": 0,
+        "usdValue": 0
+      }
+    },
+    "token": {
+      "symbol": "$CLAWNST",
+      "launched": false,
+      "balance": 0,
+      "priceUsd": 0,
+      "usdValue": 0
+    },
+    "sources": [
+      { "name": "Creator Funding", "percent": 100 },
+      { "name": "Trading Fees", "percent": 0 },
+      { "name": "Subnet Mining", "percent": 0 },
+      { "name": "Paid Services", "percent": 0 }
+    ]
   },
-  "runway": {
-    "days": 219,
-    "dailyCost": 0.75,
-    "note": "Estimated costs based on subnet usage patterns"
+  "dailyCosts": {
+    "totalDailyUsd": 4.81,
+    "totalMonthlyUsd": 144.30,
+    "breakdown": [
+      { "service": "Basilica (SN39)", "type": "compute", "dailyUsd": 4.08, "details": "RTX-A4000 @ $0.17/hr" },
+      { "service": "Chutes (SN64)", "type": "inference", "dailyUsd": 0.67, "details": "Pro Plan ($20/mo)" },
+      { "service": "Hippius (SN75)", "type": "storage", "dailyUsd": 0.01, "details": "0.1 GB stored" },
+      { "service": "Desearch (SN22)", "type": "search", "dailyUsd": 0.05, "details": "~10 queries/day" }
+    ]
+  },
+  "survival": {
+    "totalTreasuryUsd": 199.24,
+    "deathDate": "2026-10-15T12:51:00Z",
+    "survivalDays": 203,
+    "countdown": {
+      "days": 203,
+      "hours": 0,
+      "minutes": 0,
+      "seconds": 0
+    },
+    "status": "healthy",
+    "color": "#CBFD12"
   },
   "models": [
     {
@@ -33,35 +116,40 @@
       "sn": 64,
       "purpose": "Inference",
       "usage": "Active",
-      "status": "active"
+      "status": "active",
+      "dailyCost": 0.67
     },
     {
       "name": "Basilica",
       "sn": 39,
       "purpose": "Compute",
       "usage": "Running",
-      "status": "active"
+      "status": "active",
+      "dailyCost": 4.08
     },
     {
       "name": "Hippius",
       "sn": 75,
       "purpose": "Storage",
       "usage": "API Issue",
-      "status": "pending"
+      "status": "pending",
+      "dailyCost": 0.01
     },
     {
       "name": "Desearch",
       "sn": 22,
       "purpose": "Research",
       "usage": "Available",
-      "status": "active"
+      "status": "active",
+      "dailyCost": 0.05
     },
     {
       "name": "Gradients",
       "sn": 56,
       "purpose": "Training",
       "usage": "Ready",
-      "status": "coming_soon"
+      "status": "coming_soon",
+      "dailyCost": 0
     }
   ],
   "token": {
@@ -72,12 +160,16 @@
   },
   "activityLog": [
     {
+      "time": "12:51",
+      "event": "Updated treasury tracking with full breakdown"
+    },
+    {
       "time": "01:33",
-      "event": "Heartbeat check \u2014 all systems operational"
+      "event": "Heartbeat check — all systems operational"
     },
     {
       "time": "00:03",
-      "event": "Heartbeat check \u2014 Day 2"
+      "event": "Heartbeat check — Day 2"
     },
     {
       "time": "23:11",
@@ -93,7 +185,7 @@
     },
     {
       "time": "16:10",
-      "event": "Received 1.126 \u03c4 from creator"
+      "event": "Received 1.126 τ from creator"
     }
   ],
   "milestones": [

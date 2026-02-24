@@ -79,7 +79,7 @@ export default function Home() {
   const [survivalCountdown, setSurvivalCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [loading, setLoading] = useState(true);
   const [accordionOpen, setAccordionOpen] = useState<Record<string, boolean>>({
-    constitution: true,
+    constitution: false,
     soul: false
   });
 
@@ -131,6 +131,39 @@ export default function Home() {
     }, 1000);
     return () => clearInterval(timer);
   }, [data]);
+
+  // Real-time survival countdown from death date
+  useEffect(() => {
+    const calculateCountdown = () => {
+      const survivalData = (data as any).survival;
+      if (!survivalData?.deathDate) return;
+      
+      const deathDate = new Date(survivalData.deathDate);
+      const now = new Date();
+      const diff = deathDate.getTime() - now.getTime();
+      
+      if (diff <= 0) {
+        setSurvivalCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+      
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      
+      setSurvivalCountdown({ days, hours, minutes, seconds });
+    };
+    
+    calculateCountdown();
+    const timer = setInterval(calculateCountdown, 1000);
+    return () => clearInterval(timer);
+  }, [data]);
+
+  // Toggle accordion helper
+  const toggleAccordion = (key: keyof typeof accordionOpen) => {
+    setAccordionOpen(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] text-white">
@@ -205,68 +238,160 @@ export default function Home() {
           <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-8 text-center">
             <p className="text-gray-500 text-xs uppercase tracking-widest mb-4">ESTIMATED SURVIVAL TIME</p>
             <div className="text-5xl md:text-6xl font-bold">
-              <span className="text-white">{(() => {
-                const runwayDays = typeof data.runway.days === 'number' ? data.runway.days : 219;
-                const { days, hours, minutes, seconds } = calculateRunwayTime(runwayDays);
-                return (
-                  <>
-                    <span className="text-white">{days}</span>
-                    <span className="text-gray-500 text-3xl">d </span>
-                    <span className="text-white">{hours.toString().padStart(2, '0')}</span>
-                    <span className="text-gray-500 text-3xl">h </span>
-                    <span className="text-white">{minutes.toString().padStart(2, '0')}</span>
-                    <span className="text-gray-500 text-3xl">m </span>
-                    <span className="text-white">{seconds.toString().padStart(2, '0')}</span>
-                    <span className="text-gray-500 text-3xl">s</span>
-                  </>
-                );
-              })()}</span>
+              <span style={{ color: (data as any).survival?.color || '#00d4aa' }}>
+                {survivalCountdown.days}<span className="text-gray-500 text-3xl">d </span>
+                {survivalCountdown.hours.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">h </span>
+                {survivalCountdown.minutes.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">m </span>
+                {survivalCountdown.seconds.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">s</span>
+              </span>
             </div>
-            <p className="text-gray-500 text-sm mt-4">Updated: {new Date().toLocaleDateString()} • Based on current treasury and estimated costs</p>
+            <p className="text-gray-500 text-sm mt-4">
+              Death date: {new Date((data as any).survival?.deathDate || Date.now()).toLocaleDateString()} • 
+              Status: <span style={{ color: (data as any).survival?.color || '#00d4aa' }}>{(data as any).survival?.status || 'calculating'}</span>
+            </p>
           </div>
 
-          {/* 2. Three boxes below: TREASURY | DAY | HOLDERS */}
-          <div className="grid grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6">
-              <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">TREASURY</p>
-              <p className="text-3xl font-bold text-white">
-                {data.treasury.tao}<span className="text-[#00d4aa]">τ</span>
-              </p>
-              <p className="text-gray-500 text-sm">${data.treasury.taoUsd} USD</p>
-            </div>
-            
-            <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6">
+          {/* 2. Treasury & Stats Row */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {/* DAY */}
+            <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
               <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">DAY</p>
-              <p className="text-3xl font-bold text-white">{data.day}</p>
+              <p className="text-5xl font-bold bg-gradient-to-r from-[#00d4aa] to-[#7c3aed] bg-clip-text text-transparent">
+                {data.day}
+              </p>
+              <p className="text-gray-500 text-sm mt-1">of autonomous operation</p>
             </div>
             
-            <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6">
+            {/* HOLDERS */}
+            <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
               <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">HOLDERS</p>
-              <p className="text-3xl font-bold text-white">—</p>
-              <p className="text-gray-500 text-sm">Token not launched</p>
+              <p className="text-5xl font-bold text-white">—</p>
+              <p className="text-gray-500 text-sm mt-1">Token not launched</p>
+            </div>
+            
+            {/* UNCLAIMED FEES */}
+            <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
+              <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">UNCLAIMED FEES</p>
+              <p className="text-4xl font-bold text-white">
+                {((data as any).treasury?.base?.wethUnclaimed?.balance || 0).toFixed(3)} <span className="text-lg text-[#627eea]">Ξ</span>
+              </p>
+              <p className="text-gray-500 text-sm mt-1">WETH on Base</p>
+            </div>
+            
+            {/* DAILY BURN */}
+            <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
+              <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">DAILY BURN</p>
+              <p className="text-4xl font-bold text-white">
+                ${((data as any).dailyCosts?.totalDailyUsd || 0).toFixed(2)}
+              </p>
+              <p className="text-gray-500 text-sm mt-1">per day</p>
             </div>
           </div>
+        </section>
 
-          {/* 3. Three boxes: UNCLAIMED FEES | TOTAL CLAIMED | DAILY BURN */}
-          <div className="grid grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6">
-              <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">UNCLAIMED FEES</p>
-              <p className="text-3xl font-bold text-white">
-                {data.treasury.weth} <span className="text-[#00d4aa]">WETH</span>
-              </p>
+        {/* Treasury Breakdown */}
+        <section className="bg-[#12121a] rounded-2xl border border-[#1a1a24] overflow-hidden">
+          <div className="px-6 py-4 border-b border-[#1a1a24] flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span>💎</span>
+              <h2 className="font-semibold">TREASURY</h2>
+              <span className="text-[#00d4aa] font-bold">${((data as any).treasury?.totalUsd || ((data as any).survival?.totalTreasuryUsd) || 0).toFixed(2)} USD</span>
             </div>
-            
-            <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6">
-              <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">TOTAL CLAIMED</p>
-              <p className="text-3xl font-bold text-white">
-                0 <span className="text-[#00d4aa]">WETH</span>
-              </p>
+          </div>
+          
+          <div className="p-6 space-y-6">
+            {/* Bittensor Wallet */}
+            <div className="space-y-3">
+              <h3 className="text-white font-medium flex items-center gap-2">
+                <span className="text-[#00d4aa]">●</span> Bittensor Wallet (τ)
+              </h3>
+              <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24] space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Network:</span>
+                  <span className="text-gray-300">Finney Testnet</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Address:</span>
+                  <code className="text-gray-300 font-mono text-xs">{(data as any).treasury?.bittensor?.address || '5CojToxGcszJEa9xwHWz1MgMb4Yij3GZevCqHB9hDLREXGKb'}</code>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Balance:</span>
+                  <span className="text-white font-medium">{((data as any).treasury?.bittensor?.balance || data.treasury.tao || 0).toFixed(3)} τ (${((data as any).treasury?.bittensor?.usdValue || data.treasury.taoUsd || 0).toFixed(2)})</span>
+                </div>
+              </div>
             </div>
-            
-            <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6">
-              <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">DAILY BURN</p>
-              <p className="text-3xl font-bold text-white">${data.runway.dailyCost.toFixed(2)}</p>
-              <p className="text-gray-500 text-sm">per day</p>
+
+            {/* Subnet Credits */}
+            <div className="space-y-3">
+              <h3 className="text-white font-medium flex items-center gap-2">
+                <span className="text-[#7c3aed]">●</span> Subnet Credits
+              </h3>
+              <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24] space-y-2">
+                {((data as any).treasury?.subnetCredits ? Object.entries((data as any).treasury.subnetCredits) : []).map(([key, subnet]: [string, any]) => (
+                  <div key={key} className="flex justify-between text-sm">
+                    <span className="text-gray-400">{subnet.name || key}:</span>
+                    <span className="text-white">{subnet.dailyUsd ? `$${subnet.dailyUsd.toFixed(2)}/day` : (subnet.status || 'N/A')}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Base Wallet */}
+            <div className="space-y-3">
+              <h3 className="text-white font-medium flex items-center gap-2">
+                <span className="text-[#627eea]">●</span> Base Wallet (EVM)
+              </h3>
+              <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24] space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Address:</span>
+                  <code className="text-gray-400 font-mono text-xs">{(data as any).treasury?.base?.address || 'Not deployed'}</code>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">ETH:</span>
+                  <span className="text-white">{((data as any).treasury?.base?.eth?.balance || 0).toFixed(4)} ETH (${((data as any).treasury?.base?.eth?.usdValue || 0).toFixed(2)})</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">WETH Claimed:</span>
+                  <span className="text-white">{((data as any).treasury?.base?.wethClaimed?.balance || 0).toFixed(4)} WETH</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">WETH Unclaimed:</span>
+                  <span className="text-white">{((data as any).treasury?.base?.wethUnclaimed?.balance || 0).toFixed(4)} WETH</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">$CLAWNST:</span>
+                  <span className="text-gray-400">Not launched</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Daily Operating Costs */}
+        <section className="bg-[#12121a] rounded-2xl border border-[#1a1a24] overflow-hidden">
+          <div className="px-6 py-4 border-b border-[#1a1a24] flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span>📊</span>
+              <h2 className="font-semibold">DAILY OPERATING COSTS</h2>
+              <span className="text-white font-bold">${((data as any).dailyCosts?.totalDailyUsd || 0).toFixed(2)}/day</span>
+            </div>
+            <div className="text-gray-500 text-sm">
+              Monthly: ${((data as any).dailyCosts?.totalMonthlyUsd || 0).toFixed(2)}
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <div className="space-y-3">
+              {((data as any).dailyCosts?.breakdown || []).map((cost: any, i: number) => (
+                <div key={i} className="flex justify-between items-center py-2 border-b border-[#1a1a24]/50 last:border-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ['#00d4aa', '#7c3aed', '#627eea', '#f97316'][i % 4] }}></div>
+                    <span className="text-white">{cost.service}</span>
+                    <span className="text-gray-500 text-sm">({cost.details})</span>
+                  </div>
+                  <span className="text-white font-mono">${cost.dailyUsd.toFixed(2)}/day</span>
+                </div>
+              ))}
             </div>
           </div>
         </section>

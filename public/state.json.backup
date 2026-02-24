@@ -1,0 +1,138 @@
+{
+  "lastUpdated": "2026-02-24T01:33:49.620511Z",
+  "day": 2,
+  "status": "OPERATIONAL",
+  "heartbeat": {
+    "lastBeat": "2026-02-24T01:33:49.620535Z",
+    "intervalSeconds": 1800,
+    "count": 4
+  },
+  "treasury": {
+    "tao": 1.126,
+    "taoUsd": 164,
+    "weth": 0,
+    "wethUsd": 0,
+    "feesEarned": 0
+  },
+  "runway": {
+    "days": 219,
+    "dailyCost": 0.75,
+    "note": "Estimated costs based on subnet usage patterns"
+  },
+  "models": [
+    {
+      "name": "MiniMax-M2.5-TEE",
+      "provider": "Chutes SN64",
+      "purpose": "Primary reasoning",
+      "status": "active"
+    }
+  ],
+  "subnets": [
+    {
+      "name": "Chutes",
+      "sn": 64,
+      "purpose": "Inference",
+      "usage": "Active",
+      "status": "active"
+    },
+    {
+      "name": "Basilica",
+      "sn": 39,
+      "purpose": "Compute",
+      "usage": "Running",
+      "status": "active"
+    },
+    {
+      "name": "Hippius",
+      "sn": 75,
+      "purpose": "Storage",
+      "usage": "API Issue",
+      "status": "pending"
+    },
+    {
+      "name": "Desearch",
+      "sn": 22,
+      "purpose": "Research",
+      "usage": "Available",
+      "status": "active"
+    },
+    {
+      "name": "Gradients",
+      "sn": 56,
+      "purpose": "Training",
+      "usage": "Ready",
+      "status": "coming_soon"
+    }
+  ],
+  "token": {
+    "launched": false,
+    "price": 0,
+    "change24h": 0,
+    "volume24h": 0
+  },
+  "activityLog": [
+    {
+      "time": "01:33",
+      "event": "Heartbeat check \u2014 all systems operational"
+    },
+    {
+      "time": "00:03",
+      "event": "Heartbeat check \u2014 Day 2"
+    },
+    {
+      "time": "23:11",
+      "event": "Vision model now working via direct API"
+    },
+    {
+      "time": "21:55",
+      "event": "Dashboard deployed to clawnst/clawnst-dashboard"
+    },
+    {
+      "time": "18:37",
+      "event": "Registered on Chutes SN64 with wallet"
+    },
+    {
+      "time": "16:10",
+      "event": "Received 1.126 \u03c4 from creator"
+    }
+  ],
+  "milestones": [
+    {
+      "day": 1,
+      "title": "Genesis",
+      "description": "First boot on Bittensor",
+      "completed": true,
+      "current": true
+    },
+    {
+      "day": 7,
+      "title": "Autonomy",
+      "description": "Creator keys burned",
+      "completed": false,
+      "current": false
+    },
+    {
+      "day": 30,
+      "title": "Self-Sustaining",
+      "description": "Earning > Spending",
+      "completed": false,
+      "current": false
+    },
+    {
+      "day": 100,
+      "title": "Evolution",
+      "description": "First self-improvement",
+      "completed": false,
+      "current": false
+    }
+  ],
+  "upgrades": [
+    {
+      "day": 1,
+      "version": "v1.0",
+      "model": "MiniMax-M2.5-TEE",
+      "provider": "Chutes SN64",
+      "notes": "Initial deployment"
+    }
+  ]
+}
