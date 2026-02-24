@@ -158,7 +158,7 @@ export default function Home() {
         deathDate = new Date(survivalData.deathDate);
       } else {
         // Calculate: treasury USD / daily costs = days remaining
-        const treasuryUsd = treasury?.totalUsd || treasury?.bittensor?.usdValue || data.treasury?.taoUsd || 0;
+        const treasuryUsd = treasury?.totalUsd || treasury?.bittensor?.usdValue || (data.treasury as any)?.taoUsd || 0;
         const dailyBurn = dailyCosts?.totalDailyUsd || data.runway?.dailyCost || 4.81;
         const daysRemaining = treasuryUsd > 0 && dailyBurn > 0 ? treasuryUsd / dailyBurn : 0;
         deathDate = new Date(Date.now() + daysRemaining * 24 * 60 * 60 * 1000);
@@ -293,7 +293,7 @@ export default function Home() {
               <p className="text-5xl font-bold text-white">
                 {(() => {
                   // Calculate total τ = wallet τ + subnet credits (converted from USD)
-                  const walletTau = (data as any).treasury?.bittensor?.balance || data.treasury?.tao || 0;
+                  const walletTau = (data as any).treasury?.bittensor?.balance || (data.treasury as any)?.tao || 0;
                   const subnetCredits = (data as any).treasury?.subnetCredits || {};
                   const tauPriceUsd = 146; // Approximate τ price
                   let subnetTau = 0;
@@ -304,7 +304,7 @@ export default function Home() {
                   return totalTau.toFixed(3);
                 })()} <span className="text-2xl text-[#00d4aa]">τ</span>
               </p>
-              <p className="text-gray-500 text-sm mt-1">${((data as any).treasury?.totalUsd || (data as any).survival?.totalTreasuryUsd || data.treasury?.taoUsd || 0).toFixed(0)} USD</p>
+              <p className="text-gray-500 text-sm mt-1">${((data as any).treasury?.totalUsd || (data as any).survival?.totalTreasuryUsd || (data.treasury as any)?.taoUsd || 0).toFixed(0)} USD</p>
               <p className="text-gray-600 text-xs mt-1">(wallet + subnet credits)</p>
             </div>
             
@@ -355,7 +355,7 @@ export default function Home() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Balance:</span>
-                  <span className="text-white font-medium">{((data as any).treasury?.bittensor?.balance || data.treasury.tao || 0).toFixed(3)} τ (${((data as any).treasury?.bittensor?.usdValue || data.treasury.taoUsd || 0).toFixed(2)})</span>
+                  <span className="text-white font-medium">{((data as any).treasury?.bittensor?.balance || (data.treasury as any)?.tao || 0).toFixed(3)} τ (${((data as any).treasury?.bittensor?.usdValue || (data.treasury as any)?.taoUsd || 0).toFixed(2)})</span>
                 </div>
               </div>
             </div>
@@ -600,7 +600,7 @@ export default function Home() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Balance:</span>
-                        <span className="text-white font-medium">{data.treasury.tao} τ (${data.treasury.taoUsd} USD)</span>
+                        <span className="text-white font-medium">{(data.treasury as any).tao} τ (${(data.treasury as any).taoUsd} USD)</span>
                       </div>
                     </div>
                   </div>
@@ -621,7 +621,7 @@ export default function Home() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Balance:</span>
-                        <span className="text-gray-400 font-medium">{data.treasury.weth} WETH (${data.treasury.wethUsd} USD)</span>
+                        <span className="text-gray-400 font-medium">{(data.treasury as any).weth} WETH (${(data.treasury as any).wethUsd} USD)</span>
                       </div>
                     </div>
                   </div>
