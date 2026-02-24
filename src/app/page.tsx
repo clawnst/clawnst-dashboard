@@ -170,48 +170,67 @@ export default function Home() {
 
       <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
         
-        {/* Hero Stats */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Day Counter */}
-          <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
-            <p className="text-gray-500 text-xs uppercase tracking-wider mb-2">Day</p>
-            <p className="text-6xl font-bold bg-gradient-to-r from-[#00d4aa] to-[#7c3aed] bg-clip-text text-transparent">
-              {data.day}
-            </p>
-            <p className="text-gray-500 text-sm mt-2">of autonomous operation</p>
-          </div>
-          
-          {/* Runway */}
-          <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
-            <p className="text-gray-500 text-xs uppercase tracking-wider mb-2">Runway</p>
-            <p className="text-5xl font-bold text-white">
-              {data.runway.days} <span className="text-2xl text-gray-400">days</span>
-            </p>
-            <p className="text-gray-500 text-sm mt-2">${data.runway.dailyCost.toFixed(2)}/day burn rate</p>
-          </div>
-          
-          {/* Treasury */}
-          <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6">
-            <p className="text-gray-500 text-xs uppercase tracking-wider mb-4 text-center">Treasury</p>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-white">
-                  {data.treasury.tao} <span className="text-lg text-[#00d4aa]">τ</span>
-                </p>
-                <p className="text-gray-500 text-xs mt-1">TAO ≈ ${data.treasury.taoUsd}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-white">
-                  {data.treasury.weth} <span className="text-lg text-[#627eea]">Ξ</span>
-                </p>
-                <p className="text-gray-500 text-xs mt-1">WETH ≈ ${data.treasury.wethUsd}</p>
-              </div>
+        {/* Dashboard Stats - New Layout */}
+        <section className="space-y-6">
+          {/* 1. Big Runway Timer (full width, top) */}
+          <div className="bg-[#1a1a1a] rounded-lg border border-gray-800 p-8 text-center">
+            <p className="text-gray-400 text-sm tracking-widest mb-4">RUNWAY REMAINING</p>
+            <div className="text-5xl md:text-6xl font-light">
+              <span className="text-[#2dd4bf]">5</span>
+              <span className="text-gray-500 text-3xl">d </span>
+              <span className="text-[#2dd4bf]">0</span>
+              <span className="text-gray-500 text-3xl">h </span>
+              <span className="text-[#2dd4bf]">0</span>
+              <span className="text-gray-500 text-3xl">m </span>
+              <span className="text-[#2dd4bf]">0</span>
+              <span className="text-gray-500 text-3xl">s</span>
             </div>
-            {data.treasury.feesEarned > 0 && (
-              <div className="mt-4 pt-4 border-t border-[#1a1a24] text-center">
-                <p className="text-[#00d4aa] text-sm">+${data.treasury.feesEarned.toFixed(2)} fees earned</p>
-              </div>
-            )}
+            <p className="text-gray-400 mt-4">2026-02-29 (Autonomy Day)</p>
+          </div>
+
+          {/* 2. Three boxes below: TREASURY | DAY | HOLDERS */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-[#1a1a1a] rounded-lg border border-gray-800 p-6">
+              <p className="text-gray-400 text-xs tracking-widest mb-2">TREASURY</p>
+              <p className="text-3xl font-light">
+                {data.treasury.tao}<span className="text-[#2dd4bf]">τ</span>
+              </p>
+              <p className="text-gray-500 text-sm">${data.treasury.taoUsd} USD</p>
+            </div>
+            
+            <div className="bg-[#1a1a1a] rounded-lg border border-gray-800 p-6">
+              <p className="text-gray-400 text-xs tracking-widest mb-2">DAY</p>
+              <p className="text-3xl font-light">{data.day}</p>
+            </div>
+            
+            <div className="bg-[#1a1a1a] rounded-lg border border-gray-800 p-6">
+              <p className="text-gray-400 text-xs tracking-widest mb-2">HOLDERS</p>
+              <p className="text-3xl font-light">—</p>
+              <p className="text-gray-500 text-sm">Token not launched</p>
+            </div>
+          </div>
+
+          {/* 3. Three boxes: UNCLAIMED FEES | TOTAL CLAIMED | BURN RATE */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-[#1a1a1a] rounded-lg border border-gray-800 p-6">
+              <p className="text-gray-400 text-xs tracking-widest mb-2">UNCLAIMED FEES</p>
+              <p className="text-3xl font-light">
+                {data.treasury.weth} <span className="text-[#2dd4bf]">WETH</span>
+              </p>
+            </div>
+            
+            <div className="bg-[#1a1a1a] rounded-lg border border-gray-800 p-6">
+              <p className="text-gray-400 text-xs tracking-widest mb-2">TOTAL CLAIMED</p>
+              <p className="text-3xl font-light">
+                0 <span className="text-[#2dd4bf]">WETH</span>
+              </p>
+            </div>
+            
+            <div className="bg-[#1a1a1a] rounded-lg border border-gray-800 p-6">
+              <p className="text-gray-400 text-xs tracking-widest mb-2">BURN RATE</p>
+              <p className="text-3xl font-light">{data.runway.days}d</p>
+              <p className="text-gray-500 text-sm">${data.runway.dailyCost.toFixed(2)}/day</p>
+            </div>
           </div>
         </section>
 
