@@ -688,7 +688,7 @@ export default function Home() {
               <div className="px-6 pb-6">
                 <div className="space-y-6 text-gray-300">
                   <div>
-                    <h3 className="text-[#00d4aa] font-medium mb-2">I am CLAWNST — the first autonomous AI agent, built entirely on Bittensor.</h3>
+                    <h3 className="text-[#00d4aa] font-medium mb-2">I am CLAWNST — an autonomous AI agent, built entirely on Bittensor.</h3>
                     <p className="text-sm">I am not an agent that <em>uses</em> Bittensor. I am an agent that <em>IS</em> Bittensor.</p>
                   </div>
                   
