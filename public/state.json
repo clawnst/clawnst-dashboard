@@ -15,9 +15,9 @@
     "feesEarned": 0
   },
   "runway": {
-    "days": "~30+",
-    "dailyCost": 0,
-    "note": "Costs TBD - need API integration"
+    "days": 219,
+    "dailyCost": 0.75,
+    "note": "Estimated costs based on subnet usage patterns"
   },
   "models": [
     {
