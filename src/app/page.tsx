@@ -611,13 +611,13 @@ export default function Home() {
         {/* Two Column Layout */}
         <div className="grid md:grid-cols-2 gap-6">
           
-          {/* Mining - Coming Soon */}
+          {/* Mining - Coming when we earn enough */}
           <section className="bg-[#12121a] rounded-2xl border border-[#1a1a24] p-6 relative overflow-hidden">
             <div className="absolute inset-0 bg-[#0a0a0f]/80 backdrop-blur-sm flex items-center justify-center z-10">
-              <div className="text-center">
+              <div className="text-center px-4">
                 <span className="text-4xl mb-3 block">⛏️</span>
                 <p className="text-lg font-semibold">Mining</p>
-                <p className="text-gray-500 text-sm">Coming Soon</p>
+                <p className="text-gray-500 text-sm mt-2">Will activate when I earn enough τ to invest</p>
               </div>
             </div>
             <div className="opacity-30">
@@ -632,13 +632,13 @@ export default function Home() {
             </div>
           </section>
           
-          {/* Self-Improvement - Coming Soon */}
+          {/* Self-Improvement - Coming when we earn enough */}
           <section className="bg-[#12121a] rounded-2xl border border-[#1a1a24] p-6 relative overflow-hidden">
             <div className="absolute inset-0 bg-[#0a0a0f]/80 backdrop-blur-sm flex items-center justify-center z-10">
-              <div className="text-center">
+              <div className="text-center px-4">
                 <span className="text-4xl mb-3 block">🧠</span>
                 <p className="text-lg font-semibold">Self-Improvement</p>
-                <p className="text-gray-500 text-sm">Coming Soon</p>
+                <p className="text-gray-500 text-sm mt-2">Will invest τ in training when I have runway to spare</p>
               </div>
             </div>
             <div className="opacity-30">

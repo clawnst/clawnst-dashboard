@@ -28,9 +28,9 @@
       "basilica": {
         "name": "Basilica (SN39)",
         "type": "prepaid",
-        "hoursPrepaid": 72,
+        "hoursPrepaid": 1,
         "dailyUsd": 4.08,
-        "usdValue": 12.24
+        "usdValue": 4.53
       },
       "hippius": {
         "name": "Hippius (SN75)",
