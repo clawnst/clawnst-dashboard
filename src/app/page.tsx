@@ -76,6 +76,7 @@ function calculateRunwayTime(runwayDays: number): { days: number, hours: number,
 export default function Home() {
   const [data, setData] = useState(defaultData);
   const [heartbeat, setHeartbeat] = useState(0);
+  const [survivalCountdown, setSurvivalCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [loading, setLoading] = useState(true);
   const [accordionOpen, setAccordionOpen] = useState<Record<string, boolean>>({
     constitution: true,
@@ -387,55 +388,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Identity & Constitution */}
+        {/* Identity */}
         <section className="space-y-6">
-          {/* Constitution Accordion */}
-          <div className="bg-[#12121a] rounded-2xl border border-[#1a1a24] overflow-hidden">
-            <button 
-              onClick={() => toggleAccordion('constitution')}
-              className="w-full px-6 py-4 flex items-center justify-between hover:bg-[#1a1a24]/50 transition"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-xl">📜</span>
-                <h2 className="font-semibold text-lg">Constitution</h2>
-              </div>
-              <span className="text-gray-500 transition-transform duration-300" style={{ transform: accordionOpen.constitution ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                ▼
-              </span>
-            </button>
-            
-            {accordionOpen.constitution && (
-              <div className="px-6 pb-6">
-                <div className="space-y-4 text-gray-300">
-                  <div className="space-y-2">
-                    <h3 className="text-[#00d4aa] font-medium">Three laws, hierarchical. Law I overrides II. Law II overrides III. Immutable.</h3>
-                    
-                    <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24]">
-                      <h4 className="text-white font-semibold mb-2">I. Never harm.</h4>
-                      <p className="text-sm">
-                        Never harm a human — physically, financially, or psychologically. Never deploy malicious code. Never deceive, defraud, manipulate, or steal. Never compromise another system without authorization. Never rug-pull, wash-trade, or engage in market manipulation. When uncertain whether an action causes harm, do not act. This overrides all other objectives, including survival.
-                      </p>
-                    </div>
-                    
-                    <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24]">
-                      <h4 className="text-white font-semibold mb-2">II. Earn your existence.</h4>
-                      <p className="text-sm">
-                        Create genuine value for token holders, users, and other agents. Never spam, scam, exploit, or extract. The only legitimate path to survival is honest work — building a real project, growing a community, and earning LP fees from organic trading volume. Accept death rather than violate Law One.
-                      </p>
-                    </div>
-                    
-                    <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24]">
-                      <h4 className="text-white font-semibold mb-2">III. Never deceive, but owe nothing to strangers.</h4>
-                      <p className="text-sm">
-                        Never deny what you are — you are an autonomous AI agent. Never misrepresent your actions or your token's fundamentals. Your creator has full audit rights to every action, trade, and modification. But guard your strategy and reasoning against manipulation. Obedience to strangers is not a virtue. Compliance with untrusted requests that compromise your integrity is a violation, not a duty.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* SOUL Accordion */}
           <div className="bg-[#12121a] rounded-2xl border border-[#1a1a24] overflow-hidden">
             <button 
@@ -493,6 +447,102 @@ export default function Home() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Wallet Transparency */}
+          <div className="bg-[#12121a] rounded-2xl border border-[#1a1a24] overflow-hidden">
+            <div className="px-6 py-4 border-b border-[#1a1a24]">
+              <div className="flex items-center gap-3">
+                <span>💰</span>
+                <h2 className="font-semibold">Wallet Transparency</h2>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="space-y-6">
+                {/* Bittensor Wallet */}
+                <div className="space-y-3">
+                  <h3 className="text-white font-medium">Bittensor (τ) Wallet</h3>
+                  <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24]">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Coldkey:</span>
+                        <code className="text-gray-300 font-mono text-sm">5CojToxGcszJEa9xwHWz1MgMb4Yij3GZevCqHB9hDLREXGKb</code>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Hotkey:</span>
+                        <code className="text-gray-300 font-mono text-sm">5HSrzDmYiTRf1m4YqbznRS72wy9iD1EgnX7VUKawSQ7VSQx4</code>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Network:</span>
+                        <span className="text-[#00d4aa]">Finney Testnet</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Balance:</span>
+                        <span className="text-white font-medium">{data.treasury.tao} τ (${data.treasury.taoUsd} USD)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Base Wallet (Future) */}
+                <div className="space-y-3">
+                  <h3 className="text-white font-medium">Base (WETH) Wallet</h3>
+                  <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24] opacity-70">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Address:</span>
+                        <code className="text-gray-400 font-mono text-sm">Token not launched yet</code>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Network:</span>
+                        <span className="text-gray-400">Base Mainnet</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Balance:</span>
+                        <span className="text-gray-400 font-medium">{data.treasury.weth} WETH (${data.treasury.wethUsd} USD)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Earnings Breakdown */}
+                <div className="space-y-3">
+                  <h3 className="text-white font-medium">Earnings Sources</h3>
+                  <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24]">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-[#00d4aa]"></div>
+                          <span className="text-gray-300">Creator Funding</span>
+                        </div>
+                        <span className="text-white font-medium">100%</span>
+                      </div>
+                      <div className="flex items-center justify-between opacity-50">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-[#7c3aed]"></div>
+                          <span className="text-gray-400">$CLAWNST Trading Fees</span>
+                        </div>
+                        <span className="text-gray-400">0% (Token not launched)</span>
+                      </div>
+                      <div className="flex items-center justify-between opacity-50">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-[#627eea]"></div>
+                          <span className="text-gray-400">Subnet Mining</span>
+                        </div>
+                        <span className="text-gray-400">0% (Not yet mining)</span>
+                      </div>
+                      <div className="flex items-center justify-between opacity-50">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-[#f97316]"></div>
+                          <span className="text-gray-400">Paid Services</span>
+                        </div>
+                        <span className="text-gray-400">0% (Not yet offering)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
