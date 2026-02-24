@@ -437,7 +437,7 @@ export default function Home() {
                 <span>💎</span>
                 <h2 className="font-semibold">Treasury</h2>
               </div>
-              <span className="text-[#00d4aa] font-bold">${((data as any).treasury?.totalUsd || ((data as any).survival?.totalTreasuryUsd) || 0).toFixed(2)} USD</span>
+              <span className="text-[#00d4aa] font-bold">${((tauBalance * (tauPrice || 170)) + 27.53).toFixed(0)} USD</span>
             </div>
           </div>
           
