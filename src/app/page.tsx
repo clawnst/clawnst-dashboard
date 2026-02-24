@@ -144,57 +144,24 @@ export default function Home() {
     }
     fetchState();
     
-    // Fetch live TAO price - try multiple sources
+    // Fetch live TAO price from CoinGecko only (check every hour)
     async function fetchTauPrice() {
-      // Try CoinGecko first
       try {
         const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tao&vs_currencies=usd');
         if (res.ok) {
           const json = await res.json();
           if (json?.tao?.usd) {
             setTauPrice(json.tao.usd);
-            return;
+            console.log('TAO price:', json.tao.usd);
           }
         }
       } catch (e) {
-        console.log('CoinGecko failed, trying alternatives');
-      }
-      
-      // Try Taostats as fallback
-      try {
-        const res = await fetch('https://api.taostats.io/api/price/history?symbol=tao&interval=1d', {
-          headers: { 'Authorization': 'tao-58f0e439-1074-48e1-8319-3838250d3c07:d112bf3e' }
-        });
-        if (res.ok) {
-          const json = await res.json();
-          if (json?.history?.[0]?.price) {
-            setTauPrice(json.history[0].price);
-          }
-        }
-      } catch (e) {
-        // Keep default if all fail
-        setTauPrice(170); // Current market price ~$170
+        console.log('Using default TAO price');
       }
     }
     
-    // Fetch live τ balance from Taostats
-    async function fetchTauBalance() {
-      try {
-        const res = await fetch(`https://api.taostats.io/api/account/latest?address=${BITENSOR_ADDRESS}`, {
-          headers: { 'Authorization': 'tao-58f0e439-1074-48e1-8319-3838250d3c07:d112bf3e' }
-        });
-        if (res.ok) {
-          const json = await res.json();
-          if (json?.account?.balance) {
-            // Convert from rao to τ (1 τ = 10^9 rao)
-            const tau = json.account.balance / 1e9;
-            setTauBalance(tau);
-          }
-        }
-      } catch (e) {
-        console.log('Using default τ balance');
-      }
-    }
+    // τ balance - use from state.json for now (Taostats API broken)
+    // Could add manual updates later or use a different API
     
     // Calculate day number from launch date
     function calculateDayNumber() {
@@ -208,11 +175,10 @@ export default function Home() {
     fetchTauBalance();
     calculateDayNumber();
     
-    // Refresh every 30 seconds
-    const interval = setInterval(fetchState, 30000);
-    const priceInterval = setInterval(fetchTauPrice, 60000);
-    const balanceInterval = setInterval(fetchTauBalance, 60000);
-    return () => { clearInterval(interval); clearInterval(priceInterval); clearInterval(balanceInterval); };
+    // Refresh every hour (price) and every 5 min (state)
+    const stateInterval = setInterval(fetchState, 300000); // 5 min
+    const priceInterval = setInterval(fetchTauPrice, 3600000); // 1 hour
+    return () => { clearInterval(stateInterval); clearInterval(priceInterval); };
   }, []);
   
   // Heartbeat - countdown to next 30-min slot
