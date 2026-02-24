@@ -246,7 +246,7 @@ export default function Home() {
     const updateSurvival = () => {
       const treasury = (data as any).treasury;
       const dailyCosts = (data as any).dailyCosts;
-      const tauPriceVal = tauPrice || 120;
+      const tauPriceVal = tauPrice || 170;
       const ethPriceVal = 3500;
       
       // Only calculate death date once (or when treasury changes significantly)
@@ -404,9 +404,9 @@ export default function Home() {
               Based on: {(() => {
                 const treasury = (data as any).treasury;
                 const dailyCosts = (data as any).dailyCosts;
-                const tauBalance = treasury?.bittensor?.balance || 1.126;
-                const price = tauPrice || 120;
-                const usd = tauBalance * price;
+                const currentTau = tauBalance; // Use live state variable
+                const price = tauPrice || 170;
+                const usd = currentTau * price;
                 const burn = dailyCosts?.totalDailyUsd || 4.81;
                 return `$${usd.toFixed(0)} treasury ÷ $${burn.toFixed(2)}/day`;
               })()}
@@ -434,13 +434,13 @@ export default function Home() {
                   const subnetCredits = (data as any).treasury?.subnetCredits || {};
                   let subnetTau = 0;
                   Object.values(subnetCredits).forEach((s: any) => {
-                    subnetTau += (s.usdValue || 0) / (tauPrice || 120);
+                    subnetTau += (s.usdValue || 0) / (tauPrice || 170);
                   });
                   const totalTau = walletTau + subnetTau;
                   return totalTau.toFixed(3);
                 })()} <span className="text-2xl text-[#00d4aa]">τ</span>
               </p>
-              <p className="text-gray-500 text-sm mt-1">${((tauBalance * (tauPrice || 120))).toFixed(0)} USD</p>
+              <p className="text-gray-500 text-sm mt-1">${((tauBalance * (tauPrice || 170))).toFixed(0)} USD</p>
               <p className="text-gray-600 text-xs mt-1">(wallet + subnet credits)</p>
             </div>
             
@@ -497,7 +497,7 @@ export default function Home() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Balance:</span>
-                  <span className="text-white font-medium">{tauBalance.toFixed(3)} τ ${(tauBalance * (tauPrice || 120)).toFixed(2)}</span>
+                  <span className="text-white font-medium">{tauBalance.toFixed(3)} τ ${(tauBalance * (tauPrice || 170)).toFixed(2)}</span>
                 </div>
               </div>
             </div>
