@@ -7,13 +7,15 @@ const defaultData = {
   day: 1,
   status: 'OPERATIONAL',
   treasury: { 
-    tao: 0, 
-    taoUsd: 0,
-    weth: 0,
-    wethUsd: 0,
-    feesEarned: 0,
+    totalUsd: 0,
+    bittensor: { address: '', balance: 0, usdValue: 0 },
+    subnetCredits: {},
+    base: { address: '', eth: { balance: 0, usdValue: 0 }, wethClaimed: { balance: 0 }, wethUnclaimed: { balance: 0 } }
   },
+  dailyCosts: { totalDailyUsd: 0, totalMonthlyUsd: 0, breakdown: [] },
+  survival: { totalTreasuryUsd: 0, deathDate: '', survivalDays: 0, status: 'calculating', color: '#00d4aa' },
   runway: { days: 0, dailyCost: 0 },
+  model: 'MiniMax-M2.5-TEE',
   
   models: [
     { name: 'MiniMax-M2.5-TEE', purpose: 'Primary reasoning', cost: '$0.15/M', primary: true },
