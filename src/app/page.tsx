@@ -83,10 +83,6 @@ export default function Home() {
     soul: false
   });
 
-  const toggleAccordion = (id: string) => {
-    setAccordionOpen(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-  
   // Fetch state.json dynamically
   useEffect(() => {
     async function fetchState() {
