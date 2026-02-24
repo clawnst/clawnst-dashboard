@@ -278,50 +278,6 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [tauBalance, tauPrice, data]);
 
-  // Real-time survival countdown from death date
-  useEffect(() => {
-    const calculateCountdown = () => {
-      const survivalData = (data as any).survival;
-      const treasury = (data as any).treasury;
-      const dailyCosts = (data as any).dailyCosts;
-      
-      let deathDate: Date;
-      
-      // Try to get death date from survival data, or calculate from treasury
-      if (survivalData?.deathDate) {
-        deathDate = new Date(survivalData.deathDate);
-      } else {
-        // Calculate: treasury USD / daily costs = days remaining
-        // Get τ balance and calculate USD value using live price
-        const tauBalance = treasury?.bittensor?.balance || (data.treasury as any)?.tao || 1.126;
-        const currentTauPrice = tauPrice || 120; // Use live price from state or default
-        const treasuryUsd = tauBalance * currentTauPrice;
-        const dailyBurn = dailyCosts?.totalDailyUsd || (data.runway as any)?.dailyCost || 4.81;
-        const daysRemaining = treasuryUsd > 0 && dailyBurn > 0 ? treasuryUsd / dailyBurn : 0;
-        deathDate = new Date(Date.now() + daysRemaining * 24 * 60 * 60 * 1000);
-      }
-      
-      const now = new Date();
-      const diff = deathDate.getTime() - now.getTime();
-      
-      if (diff <= 0) {
-        setSurvivalCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
-      
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      
-      setSurvivalCountdown({ days, hours, minutes, seconds });
-    };
-    
-    calculateCountdown();
-    const timer = setInterval(calculateCountdown, 1000);
-    return () => clearInterval(timer);
-  }, [data]);
-
   // Toggle accordion helper
   const toggleAccordion = (key: keyof typeof accordionOpen) => {
     setAccordionOpen(prev => ({ ...prev, [key]: !prev[key] }));
