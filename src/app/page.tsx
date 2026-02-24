@@ -283,38 +283,37 @@ export default function Home() {
         
         {/* Dashboard Stats - Updated to match site styling */}
         <section className="space-y-6">
-          {/* 1. Big Runway Timer (full width, top) - calculate directly */}
+          {/* 1. Big Runway Timer (full width, top) - calculate dynamically from treasury */}
           <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-8 text-center">
             <p className="text-gray-500 text-xs tracking-widest mb-4">Estimated Survival Time ⏱️</p>
             <div className="text-5xl md:text-6xl font-bold">
               {(() => {
-                const survivalData = (data as any).survival;
-                let deathDate: Date;
+                // ALWAYS calculate dynamically from treasury and daily burn
+                const treasury = (data as any).treasury;
+                const dailyCosts = (data as any).dailyCosts;
+                const tauBalance = treasury?.bittensor?.balance || 1.126;
+                const tauPriceVal = tauPrice || 120; // Live price from Taostats
+                const treasuryUsd = tauBalance * tauPriceVal;
+                const dailyBurn = dailyCosts?.totalDailyUsd || 4.81;
+                const daysRemaining = dailyBurn > 0 ? treasuryUsd / dailyBurn : 0;
                 
-                // Get death date from survival data
-                if (survivalData?.deathDate) {
-                  deathDate = new Date(survivalData.deathDate);
-                } else {
-                  // Fallback: calculate from treasury and daily costs
-                  const treasury = (data as any).treasury;
-                  const dailyCosts = (data as any).dailyCosts;
-                  const tauBalance = treasury?.bittensor?.balance || 1.126;
-                  const tauPriceVal = tauPrice || 120;
-                  const treasuryUsd = tauBalance * tauPriceVal;
-                  const dailyBurn = dailyCosts?.totalDailyUsd || 4.81;
-                  const daysRemaining = treasuryUsd / dailyBurn;
-                  deathDate = new Date(Date.now() + daysRemaining * 24 * 60 * 60 * 1000);
-                }
-                
+                // Calculate countdown from now
                 const now = new Date();
+                const deathDate = new Date(now.getTime() + daysRemaining * 24 * 60 * 60 * 1000);
                 const diff = Math.max(0, deathDate.getTime() - now.getTime());
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((diff % (1000 * 60)) / 1000);
                 
+                // Color based on days remaining
+                let color = '#00d4aa'; // green
+                if (days < 7) color = '#ff0000'; // red - emergency
+                else if (days < 30) color = '#ff6600'; // orange - critical
+                else if (days < 90) color = '#ffa500'; // yellow - warning
+                
                 return (
-                  <span style={{ color: survivalData?.color || '#00d4aa' }}>
+                  <span style={{ color }}>
                     {days}<span className="text-gray-500 text-3xl">d </span>
                     {hours.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">h </span>
                     {minutes.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">m </span>
@@ -324,8 +323,15 @@ export default function Home() {
               })()}
             </div>
             <p className="text-gray-500 text-sm mt-4">
-              Death: {new Date((data as any).survival?.deathDate || Date.now()).toLocaleDateString()} • 
-              Status: <span style={{ color: (data as any).survival?.color || '#00d4aa' }}>{(data as any).survival?.status || 'loading'}</span>
+              Based on: {(() => {
+                const treasury = (data as any).treasury;
+                const dailyCosts = (data as any).dailyCosts;
+                const tauBalance = treasury?.bittensor?.balance || 1.126;
+                const price = tauPrice || 120;
+                const usd = tauBalance * price;
+                const burn = dailyCosts?.totalDailyUsd || 4.81;
+                return `$${usd.toFixed(0)} treasury ÷ $${burn.toFixed(2)}/day`;
+              })()}
             </p>
           </div>
 
