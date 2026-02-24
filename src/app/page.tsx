@@ -62,6 +62,17 @@ function formatTime(seconds: number): string {
   return `${m}m ${s}s`;
 }
 
+function calculateRunwayTime(runwayDays: number): { days: number, hours: number, minutes: number, seconds: number } {
+  // Convert days to seconds for countdown
+  const totalSeconds = Math.floor(runwayDays * 24 * 60 * 60);
+  const days = Math.floor(totalSeconds / (24 * 60 * 60));
+  const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
+  const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+  const seconds = totalSeconds % 60;
+  
+  return { days, hours, minutes, seconds };
+}
+
 export default function Home() {
   const [data, setData] = useState(defaultData);
   const [heartbeat, setHeartbeat] = useState(0);
@@ -174,18 +185,26 @@ export default function Home() {
         <section className="space-y-6">
           {/* 1. Big Runway Timer (full width, top) */}
           <div className="bg-[#1a1a1a] rounded-lg border border-gray-800 p-8 text-center">
-            <p className="text-gray-400 text-sm tracking-widest mb-4">RUNWAY REMAINING</p>
+            <p className="text-gray-400 text-sm tracking-widest mb-4">ESTIMATED SURVIVAL TIME</p>
             <div className="text-5xl md:text-6xl font-light">
-              <span className="text-[#2dd4bf]">5</span>
-              <span className="text-gray-500 text-3xl">d </span>
-              <span className="text-[#2dd4bf]">0</span>
-              <span className="text-gray-500 text-3xl">h </span>
-              <span className="text-[#2dd4bf]">0</span>
-              <span className="text-gray-500 text-3xl">m </span>
-              <span className="text-[#2dd4bf]">0</span>
-              <span className="text-gray-500 text-3xl">s</span>
+              <span className="text-[#2dd4bf]">{(() => {
+                const runwayDays = typeof data.runway.days === 'number' ? data.runway.days : 219;
+                const { days, hours, minutes, seconds } = calculateRunwayTime(runwayDays);
+                return (
+                  <>
+                    <span className="text-[#2dd4bf]">{days}</span>
+                    <span className="text-gray-500 text-3xl">d </span>
+                    <span className="text-[#2dd4bf]">{hours.toString().padStart(2, '0')}</span>
+                    <span className="text-gray-500 text-3xl">h </span>
+                    <span className="text-[#2dd4bf]">{minutes.toString().padStart(2, '0')}</span>
+                    <span className="text-gray-500 text-3xl">m </span>
+                    <span className="text-[#2dd4bf]">{seconds.toString().padStart(2, '0')}</span>
+                    <span className="text-gray-500 text-3xl">s</span>
+                  </>
+                );
+              })()}</span>
             </div>
-            <p className="text-gray-400 mt-4">2026-02-29 (Autonomy Day)</p>
+            <p className="text-gray-400 mt-4">Updated: {new Date().toLocaleDateString()} • Based on current treasury and estimated costs</p>
           </div>
 
           {/* 2. Three boxes below: TREASURY | DAY | HOLDERS */}
@@ -227,9 +246,9 @@ export default function Home() {
             </div>
             
             <div className="bg-[#1a1a1a] rounded-lg border border-gray-800 p-6">
-              <p className="text-gray-400 text-xs tracking-widest mb-2">BURN RATE</p>
-              <p className="text-3xl font-light">{data.runway.days}d</p>
-              <p className="text-gray-500 text-sm">${data.runway.dailyCost.toFixed(2)}/day</p>
+              <p className="text-gray-400 text-xs tracking-widest mb-2">DAILY BURN</p>
+              <p className="text-3xl font-light">${data.runway.dailyCost.toFixed(2)}</p>
+              <p className="text-gray-500 text-sm">per day</p>
             </div>
           </div>
         </section>
