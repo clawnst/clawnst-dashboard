@@ -11,10 +11,10 @@
   "treasury": {
     "totalUsd": 164,
     "bittensor": {
-      "address": "5CojToxGcszJEa9xwHWz1MgMb4Yij3GZevCqHB9hDLREXGKb",
+      "address": "5CojToxGcszJEa9xwHWz1MgMb4Yij3GevCqHB9hDLREXGKb",
       "network": "finney",
-      "balance": 1.126,
-      "usdValue": 191,
+      "balance": 0.826,
+      "usdValue": 140,
       "staked": 0
     },
     "subnetCredits": {
