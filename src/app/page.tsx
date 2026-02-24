@@ -90,12 +90,18 @@ function calculateRunwayTime(runwayDays: number): { days: number, hours: number,
   return { days, hours, minutes, seconds };
 }
 
+// Launch date for day counter
+const LAUNCH_DATE = new Date('2026-02-22T00:00:00Z');
+const BITENSOR_ADDRESS = '5CojToxGcszJEa9xwHWz1MgMb4Yij3GZevCqHB9hDLREXGKb';
+
 export default function Home() {
   const [data, setData] = useState(defaultData);
   const [heartbeat, setHeartbeat] = useState(0);
   const [survivalCountdown, setSurvivalCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [loading, setLoading] = useState(true);
   const [tauPrice, setTauPrice] = useState(120);
+  const [tauBalance, setTauBalance] = useState(1.126); // Live τ balance
+  const [dayNumber, setDayNumber] = useState(2); // Auto-calculated from launch date
   const [accordionOpen, setAccordionOpen] = useState<Record<string, boolean>>({
     constitution: false,
     soul: false
@@ -146,12 +152,43 @@ export default function Home() {
         console.log('Using default TAO price');
       }
     }
+    
+    // Fetch live τ balance from Taostats
+    async function fetchTauBalance() {
+      try {
+        const res = await fetch(`https://api.taostats.io/api/account/latest?address=${BITENSOR_ADDRESS}`, {
+          headers: { 'Authorization': 'tao-58f0e439-1074-48e1-8319-3838250d3c07:d112bf3e' }
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json?.account?.balance) {
+            // Convert from rao to τ (1 τ = 10^9 rao)
+            const tau = json.account.balance / 1e9;
+            setTauBalance(tau);
+          }
+        }
+      } catch (e) {
+        console.log('Using default τ balance');
+      }
+    }
+    
+    // Calculate day number from launch date
+    function calculateDayNumber() {
+      const now = new Date();
+      const diffMs = now.getTime() - LAUNCH_DATE.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      setDayNumber(diffDays + 1); // Day 1 is launch day
+    }
+    
     fetchTauPrice();
+    fetchTauBalance();
+    calculateDayNumber();
     
     // Refresh every 30 seconds
     const interval = setInterval(fetchState, 30000);
     const priceInterval = setInterval(fetchTauPrice, 60000);
-    return () => { clearInterval(interval); clearInterval(priceInterval); };
+    const balanceInterval = setInterval(fetchTauBalance, 60000);
+    return () => { clearInterval(interval); clearInterval(priceInterval); clearInterval(balanceInterval); };
   }, []);
   
   // Heartbeat countdown
@@ -291,9 +328,9 @@ export default function Home() {
                 // ALWAYS calculate dynamically from treasury and daily burn
                 const treasury = (data as any).treasury;
                 const dailyCosts = (data as any).dailyCosts;
-                const tauBalance = treasury?.bittensor?.balance || 1.126;
+                const tauBalanceVal = tauBalance; // Live from Taostats
                 const tauPriceVal = tauPrice || 120; // Live price from Taostats
-                const treasuryUsd = tauBalance * tauPriceVal;
+                const treasuryUsd = tauBalanceVal * tauPriceVal;
                 const dailyBurn = dailyCosts?.totalDailyUsd || 4.81;
                 const daysRemaining = dailyBurn > 0 ? treasuryUsd / dailyBurn : 0;
                 
@@ -341,7 +378,7 @@ export default function Home() {
             <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
               <p className="text-gray-500 text-xs tracking-widest mb-2">Day</p>
               <p className="text-5xl font-bold bg-gradient-to-r from-[#00d4aa] to-[#7c3aed] bg-clip-text text-transparent">
-                {data.day}
+                {dayNumber}
               </p>
               <p className="text-gray-500 text-sm mt-1">of autonomous operation</p>
             </div>
@@ -351,19 +388,18 @@ export default function Home() {
               <p className="text-gray-500 text-xs tracking-widest mb-2">Treasury</p>
               <p className="text-5xl font-bold text-white">
                 {(() => {
-                  // Calculate total τ = wallet τ + subnet credits (converted from USD)
-                  const walletTau = (data as any).treasury?.bittensor?.balance || (data.treasury as any)?.tao || 0;
+                  // Use live τ balance from Taostats + subnet credits
+                  const walletTau = tauBalance;
                   const subnetCredits = (data as any).treasury?.subnetCredits || {};
-                  const tauPriceUsd = 146; // Approximate τ price
                   let subnetTau = 0;
                   Object.values(subnetCredits).forEach((s: any) => {
-                    subnetTau += (s.usdValue || 0) / tauPriceUsd;
+                    subnetTau += (s.usdValue || 0) / (tauPrice || 120);
                   });
                   const totalTau = walletTau + subnetTau;
                   return totalTau.toFixed(3);
                 })()} <span className="text-2xl text-[#00d4aa]">τ</span>
               </p>
-              <p className="text-gray-500 text-sm mt-1">${((data as any).treasury?.totalUsd || (data as any).survival?.totalTreasuryUsd || (data.treasury as any)?.taoUsd || 0).toFixed(0)} USD</p>
+              <p className="text-gray-500 text-sm mt-1">${((tauBalance * (tauPrice || 120))).toFixed(0)} USD</p>
               <p className="text-gray-600 text-xs mt-1">(wallet + subnet credits)</p>
             </div>
             
@@ -420,7 +456,7 @@ export default function Home() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Balance:</span>
-                  <span className="text-white font-medium">{((data as any).treasury?.bittensor?.balance || (data.treasury as any)?.tao || 0).toFixed(3)} τ ${((data as any).treasury?.bittensor?.usdValue || (data.treasury as any)?.taoUsd || 0).toFixed(2)}</span>
+                  <span className="text-white font-medium">{tauBalance.toFixed(3)} τ ${(tauBalance * (tauPrice || 120)).toFixed(2)}</span>
                 </div>
               </div>
             </div>
