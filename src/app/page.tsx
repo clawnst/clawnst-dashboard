@@ -244,8 +244,8 @@ export default function Home() {
               </span>
             </div>
             <p className="text-gray-500 text-sm mt-4">
-              Death date: {new Date((data as any).survival?.deathDate || Date.now()).toLocaleDateString()} • 
-              Status: <span style={{ color: (data as any).survival?.color || '#00d4aa' }}>{(data as any).survival?.status || 'calculating'}</span>
+              Death: {new Date((data as any).survival?.deathDate || Date.now()).toLocaleDateString()} • 
+              Status: <span style={{ color: (data as any).survival?.color || '#00d4aa' }}>{(data as any).survival?.status || 'loading'}</span>
             </p>
           </div>
 
