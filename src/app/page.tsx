@@ -29,6 +29,7 @@ const defaultData = {
   },
   survival: { totalTreasuryUsd: 199.24, deathDate: '2026-10-15T12:51:00Z', survivalDays: 203, status: 'healthy', color: '#CBFD12' },
   runway: { days: 203, dailyCost: 4.81 },
+  tauPriceUsd: 120, // Live TAO price (will be updated via API)
   model: 'MiniMax-M2.5-TEE',
   
   models: [
@@ -94,6 +95,7 @@ export default function Home() {
   const [heartbeat, setHeartbeat] = useState(0);
   const [survivalCountdown, setSurvivalCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [loading, setLoading] = useState(true);
+  const [tauPrice, setTauPrice] = useState(120);
   const [accordionOpen, setAccordionOpen] = useState<Record<string, boolean>>({
     constitution: false,
     soul: false
@@ -128,9 +130,28 @@ export default function Home() {
     }
     fetchState();
     
+    // Fetch live TAO price from Taostats API
+    async function fetchTauPrice() {
+      try {
+        const res = await fetch('https://api.taostats.io/api/price/history?symbol=tao&interval=1d', {
+          headers: { 'Authorization': 'tao-58f0e439-1074-48e1-8319-3838250d3c07:d112bf3e' }
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json?.history?.[0]?.price) {
+            setTauPrice(json.history[0].price);
+          }
+        }
+      } catch (e) {
+        console.log('Using default TAO price');
+      }
+    }
+    fetchTauPrice();
+    
     // Refresh every 30 seconds
     const interval = setInterval(fetchState, 30000);
-    return () => clearInterval(interval);
+    const priceInterval = setInterval(fetchTauPrice, 60000);
+    return () => { clearInterval(interval); clearInterval(priceInterval); };
   }, []);
   
   // Heartbeat countdown
@@ -158,8 +179,11 @@ export default function Home() {
         deathDate = new Date(survivalData.deathDate);
       } else {
         // Calculate: treasury USD / daily costs = days remaining
-        const treasuryUsd = treasury?.totalUsd || treasury?.bittensor?.usdValue || (data.treasury as any)?.taoUsd || 0;
-        const dailyBurn = dailyCosts?.totalDailyUsd || data.runway?.dailyCost || 4.81;
+        // Get τ balance and calculate USD value using live price
+        const tauBalance = treasury?.bittensor?.balance || (data.treasury as any)?.tao || 1.126;
+        const currentTauPrice = tauPrice || 120; // Use live price from state or default
+        const treasuryUsd = tauBalance * currentTauPrice;
+        const dailyBurn = dailyCosts?.totalDailyUsd || (data.runway as any)?.dailyCost || 4.81;
         const daysRemaining = treasuryUsd > 0 && dailyBurn > 0 ? treasuryUsd / dailyBurn : 0;
         deathDate = new Date(Date.now() + daysRemaining * 24 * 60 * 60 * 1000);
       }
@@ -308,11 +332,13 @@ export default function Home() {
               <p className="text-gray-600 text-xs mt-1">(wallet + subnet credits)</p>
             </div>
             
-            {/* HOLDERS */}
+            {/* FEES - WETH */}
             <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
-              <p className="text-gray-500 text-xs tracking-widest mb-2">Holders</p>
-              <p className="text-5xl font-bold text-white">—</p>
-              <p className="text-gray-500 text-sm mt-1">Token not launched</p>
+              <p className="text-gray-500 text-xs tracking-widest mb-2">Unclaimed Fees</p>
+              <p className="text-4xl font-bold text-white">
+                {((data as any).treasury?.base?.wethUnclaimed?.balance || 0).toFixed(3)} <span className="text-lg text-[#627eea]">Ξ</span>
+              </p>
+              <p className="text-gray-500 text-sm mt-1">WETH on Base</p>
             </div>
             
             {/* DAILY BURN */}
@@ -415,8 +441,7 @@ export default function Home() {
                 <h2 className="font-semibold">Daily Operating Costs</h2>
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-[#00d4aa] font-bold">${((data as any).dailyCosts?.totalDailyUsd || 0).toFixed(2)}/day</span>
-                <span className="text-[#00d4aa] text-sm">Monthly: ${((data as any).dailyCosts?.totalMonthlyUsd || 0).toFixed(2)}</span>
+                <span className="text-[#00d4aa] font-bold">Monthly: ${((data as any).dailyCosts?.totalMonthlyUsd || 0).toFixed(2)}</span>
               </div>
             </div>
             <p className="text-gray-500 text-sm mt-2">100% powered by Bittensor</p>
