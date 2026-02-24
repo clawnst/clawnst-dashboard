@@ -175,6 +175,15 @@ export default function Home() {
                 </div>
               </div>
               
+              {/* Current Model */}
+              <div className="flex items-center gap-3 bg-[#12121a] px-4 py-2 rounded-lg border border-[#1a1a24]">
+                <div className="w-2 h-2 bg-[#7c3aed] rounded-full"></div>
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">Model</p>
+                  <p className="text-[#7c3aed] font-mono text-sm">MiniMax-M2.5-TEE</p>
+                </div>
+              </div>
+              
               {/* Status Badge */}
               <div className={`px-3 py-1.5 rounded-full text-xs font-semibold ${
                 data.status === 'OPERATIONAL' 
