@@ -441,52 +441,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-          
-          <div className="divide-y divide-[#1a1a24]">
-            {data.subnets.map((subnet, i) => (
-              <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-[#1a1a24]/50 transition">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[#1a1a24] flex items-center justify-center text-sm font-mono text-gray-400">
-                    {subnet.sn}
-                  </div>
-                  <div>
-                    <p className="font-medium">{subnet.name}</p>
-                    <p className="text-gray-500 text-sm">{subnet.purpose}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <span className="text-gray-400 text-sm">{subnet.usage}</span>
-                  <span className="text-gray-400 text-sm font-mono w-20 text-right">
-                    {subnet.dailyCost > 0 ? `$${subnet.dailyCost.toFixed(2)}/d` : '—'}
-                  </span>
-                  {subnet.status === 'active' && (
-                    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#00d4aa]/10 text-[#00d4aa] border border-[#00d4aa]/20">
-                      Active
-                    </span>
-                  )}
-                  {subnet.status === 'pending' && (
-                    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
-                      Pending
-                    </span>
-                  )}
-                  {subnet.status === 'coming_soon' && (
-                    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500/10 text-gray-400 border border-gray-500/20">
-                      Coming Soon
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Total Daily Cost */}
-          <div className="px-6 py-4 bg-[#0d0d12] flex items-center justify-between">
-            <span className="text-gray-400 text-sm">Total Daily Cost</span>
-            <span className="text-white font-semibold">
-              ${data.subnets.reduce((sum, s) => sum + s.dailyCost, 0).toFixed(2)}/day
-            </span>
-          </div>
-        </section>
 
         {/* Two Column Layout */}
         <div className="grid md:grid-cols-2 gap-6">
