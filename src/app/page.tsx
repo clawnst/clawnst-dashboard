@@ -676,7 +676,9 @@ export default function Home() {
             )}
           </div>
 
-          {/* Upgrade History */}
+        </section>
+
+        {/* Upgrade History */}
         <section className="bg-[#12121a] rounded-2xl border border-[#1a1a24] overflow-hidden">
           <div className="px-6 py-4 border-b border-[#1a1a24]">
             <div className="flex items-center gap-3">
