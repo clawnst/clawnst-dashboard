@@ -96,9 +96,9 @@ const BITENSOR_ADDRESS = '5CojToxGcszJEa9xwHWz1MgMb4Yij3GZevCqHB9hDLREXGKb';
 
 export default function Home() {
   const [data, setData] = useState(defaultData);
-  const [lastHeartbeatAt, setLastHeartbeatAt] = useState<number>(Date.now());
-  const [heartbeatDisplay, setHeartbeatDisplay] = useState({ minutes: 0, seconds: 0, status: 'healthy' });
+  const [heartbeatCountdown, setHeartbeatCountdown] = useState(1800); // 30 min countdown
   const [survivalCountdown, setSurvivalCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [survivalTime, setSurvivalTime] = useState(0); // Total seconds remaining
   const [loading, setLoading] = useState(true);
   const [tauPrice, setTauPrice] = useState(120);
   const [tauBalance, setTauBalance] = useState(1.126); // Live τ balance
@@ -120,20 +120,9 @@ export default function Home() {
           const json = await res.json();
           setData({ ...defaultData, ...json });
           
-          // Get last heartbeat timestamp (time since last heartbeat response)
-          // If no recent heartbeat or old data, use current time
-          const now = Date.now();
-          if (json.heartbeat?.lastBeat) {
-            const lastBeat = new Date(json.heartbeat.lastBeat).getTime();
-            // If last beat was > 1 hour ago, assume we're waiting for first one
-            if (now - lastBeat < 3600000) {
-              setLastHeartbeatAt(lastBeat);
-            } else {
-              setLastHeartbeatAt(now); // Start fresh
-            }
-          } else {
-            setLastHeartbeatAt(now); // No data, start fresh
-          }
+          // Reset heartbeat to 30 min interval
+          const interval = json.heartbeat?.intervalSeconds || 1800;
+          setHeartbeatCountdown(interval);
         }
       } catch (e) {
         console.log('Using default data - state.json not available');
@@ -198,33 +187,46 @@ export default function Home() {
     return () => { clearInterval(interval); clearInterval(priceInterval); clearInterval(balanceInterval); };
   }, []);
   
-  // Heartbeat - shows time since last heartbeat response
+  // Heartbeat - countdown every 30 minutes
   useEffect(() => {
-    const updateHeartbeat = () => {
-      const now = Date.now();
-      let elapsed = Math.floor((now - lastHeartbeatAt) / 1000);
+    const timer = setInterval(() => {
+      setHeartbeatCountdown(prev => {
+        if (prev <= 0) return 1800; // Reset to 30 min after each heartbeat
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Survival countdown - updates every second
+  useEffect(() => {
+    const updateSurvival = () => {
+      const treasury = (data as any).treasury;
+      const dailyCosts = (data as any).dailyCosts;
       
-      // If heartbeat is older than 1 hour, show "waiting..." instead
-      if (elapsed > 3600) {
-        setHeartbeatDisplay({ minutes: 0, seconds: 0, status: 'waiting' });
-        return;
-      }
+      // Use live tau balance and price
+      const tauBalanceVal = tauBalance;
+      const tauPriceVal = tauPrice || 120;
+      const treasuryUsd = tauBalanceVal * tauPriceVal;
+      const dailyBurn = dailyCosts?.totalDailyUsd || 4.81;
+      const daysRemaining = dailyBurn > 0 ? treasuryUsd / dailyBurn : 0;
       
-      const minutes = Math.floor(elapsed / 60);
-      const seconds = elapsed % 60;
+      // Convert to total seconds and countdown
+      const totalSeconds = Math.floor(daysRemaining * 24 * 60 * 60);
+      setSurvivalTime(totalSeconds);
       
-      // Status: healthy (< 30min), warning (30-35min), critical (> 35min)
-      let status = 'healthy';
-      if (elapsed > 2100) status = 'critical'; // > 35 min
-      else if (elapsed > 1800) status = 'warning'; // > 30 min
+      const days = Math.floor(totalSeconds / (24 * 60 * 60));
+      const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
+      const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+      const seconds = totalSeconds % 60;
       
-      setHeartbeatDisplay({ minutes, seconds, status });
+      setSurvivalCountdown({ days, hours, minutes, seconds });
     };
     
-    updateHeartbeat();
-    const timer = setInterval(updateHeartbeat, 1000);
+    updateSurvival();
+    const timer = setInterval(updateSurvival, 1000);
     return () => clearInterval(timer);
-  }, [lastHeartbeatAt]);
+  }, [tauBalance, tauPrice, data]);
 
   // Real-time survival countdown from death date
   useEffect(() => {
@@ -314,11 +316,8 @@ export default function Home() {
                 <div className="w-2 h-2 bg-[#00d4aa] rounded-full animate-pulse"></div>
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider">Heartbeat</p>
-                  <p className={`font-mono text-sm ${
-                    heartbeatDisplay.status === 'critical' ? 'text-red-500' : 
-                    heartbeatDisplay.status === 'warning' ? 'text-yellow-500' : 'text-[#00d4aa]'
-                  }`}>
-                    {heartbeatDisplay.minutes}m {heartbeatDisplay.seconds}s
+                  <p className="text-[#00d4aa] font-mono text-sm">
+                    {Math.floor(heartbeatCountdown / 60)}m {heartbeatCountdown % 60}s
                   </p>
                 </div>
               </div>
@@ -354,36 +353,18 @@ export default function Home() {
             <p className="text-gray-500 text-xs tracking-widest mb-4">Estimated Survival Time ⏱️</p>
             <div className="text-5xl md:text-6xl font-bold">
               {(() => {
-                // ALWAYS calculate dynamically from treasury and daily burn
-                const treasury = (data as any).treasury;
-                const dailyCosts = (data as any).dailyCosts;
-                const tauBalanceVal = tauBalance; // Live from Taostats
-                const tauPriceVal = tauPrice || 120; // Live price from Taostats
-                const treasuryUsd = tauBalanceVal * tauPriceVal;
-                const dailyBurn = dailyCosts?.totalDailyUsd || 4.81;
-                const daysRemaining = dailyBurn > 0 ? treasuryUsd / dailyBurn : 0;
-                
-                // Calculate countdown from now
-                const now = new Date();
-                const deathDate = new Date(now.getTime() + daysRemaining * 24 * 60 * 60 * 1000);
-                const diff = Math.max(0, deathDate.getTime() - now.getTime());
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                
                 // Color based on days remaining
-                let color = '#00d4aa'; // green
-                if (days < 7) color = '#ff0000'; // red - emergency
-                else if (days < 30) color = '#ff6600'; // orange - critical
-                else if (days < 90) color = '#ffa500'; // yellow - warning
+                let color = '#00d4aa';
+                if (survivalCountdown.days < 7) color = '#ff0000';
+                else if (survivalCountdown.days < 30) color = '#ff6600';
+                else if (survivalCountdown.days < 90) color = '#ffa500';
                 
                 return (
                   <span style={{ color }}>
-                    {days}<span className="text-gray-500 text-3xl">d </span>
-                    {hours.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">h </span>
-                    {minutes.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">m </span>
-                    {seconds.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">s</span>
+                    {survivalCountdown.days}<span className="text-gray-500 text-3xl">d </span>
+                    {survivalCountdown.hours.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">h </span>
+                    {survivalCountdown.minutes.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">m </span>
+                    {survivalCountdown.seconds.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">s</span>
                   </span>
                 );
               })()}
