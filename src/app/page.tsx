@@ -96,7 +96,8 @@ const BITENSOR_ADDRESS = '5CojToxGcszJEa9xwHWz1MgMb4Yij3GZevCqHB9hDLREXGKb';
 
 export default function Home() {
   const [data, setData] = useState(defaultData);
-  const [heartbeat, setHeartbeat] = useState(0);
+  const [lastHeartbeatAt, setLastHeartbeatAt] = useState<number>(Date.now());
+  const [heartbeatDisplay, setHeartbeatDisplay] = useState({ minutes: 0, seconds: 0, status: 'healthy' });
   const [survivalCountdown, setSurvivalCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [loading, setLoading] = useState(true);
   const [tauPrice, setTauPrice] = useState(120);
@@ -119,13 +120,10 @@ export default function Home() {
           const json = await res.json();
           setData({ ...defaultData, ...json });
           
-          // Calculate heartbeat from lastBeat timestamp
+          // Get last heartbeat timestamp (time since last heartbeat response)
           if (json.heartbeat?.lastBeat) {
             const lastBeat = new Date(json.heartbeat.lastBeat).getTime();
-            const now = Date.now();
-            const elapsed = Math.floor((now - lastBeat) / 1000);
-            const interval = json.heartbeat.intervalSeconds || 1800;
-            setHeartbeat(Math.max(0, interval - (elapsed % interval)));
+            setLastHeartbeatAt(lastBeat);
           }
         }
       } catch (e) {
@@ -191,16 +189,26 @@ export default function Home() {
     return () => { clearInterval(interval); clearInterval(priceInterval); clearInterval(balanceInterval); };
   }, []);
   
-  // Heartbeat countdown
+  // Heartbeat - shows time since last heartbeat response
   useEffect(() => {
-    const timer = setInterval(() => {
-      setHeartbeat(prev => {
-        const interval = (data as any).heartbeat?.intervalSeconds || 1800;
-        return prev > 0 ? prev - 1 : interval;
-      });
-    }, 1000);
+    const updateHeartbeat = () => {
+      const now = Date.now();
+      const elapsed = Math.floor((now - lastHeartbeatAt) / 1000);
+      const minutes = Math.floor(elapsed / 60);
+      const seconds = elapsed % 60;
+      
+      // Status: healthy (< 30min), warning (30-35min), critical (> 35min)
+      let status = 'healthy';
+      if (elapsed > 2100) status = 'critical'; // > 35 min
+      else if (elapsed > 1800) status = 'warning'; // > 30 min
+      
+      setHeartbeatDisplay({ minutes, seconds, status });
+    };
+    
+    updateHeartbeat();
+    const timer = setInterval(updateHeartbeat, 1000);
     return () => clearInterval(timer);
-  }, [data]);
+  }, [lastHeartbeatAt]);
 
   // Real-time survival countdown from death date
   useEffect(() => {
@@ -290,7 +298,12 @@ export default function Home() {
                 <div className="w-2 h-2 bg-[#00d4aa] rounded-full animate-pulse"></div>
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider">Heartbeat</p>
-                  <p className="text-[#00d4aa] font-mono text-sm">{formatTime(heartbeat)}</p>
+                  <p className={`font-mono text-sm ${
+                    heartbeatDisplay.status === 'critical' ? 'text-red-500' : 
+                    heartbeatDisplay.status === 'warning' ? 'text-yellow-500' : 'text-[#00d4aa]'
+                  }`}>
+                    {heartbeatDisplay.minutes}m {heartbeatDisplay.seconds}s
+                  </p>
                 </div>
               </div>
               
