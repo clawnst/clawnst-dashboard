@@ -261,7 +261,7 @@ export default function Home() {
         <section className="space-y-6">
           {/* 1. Big Runway Timer (full width, top) */}
           <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-8 text-center">
-            <p className="text-gray-500 text-xs tracking-widest mb-4">Estimated Survival Time</p>
+            <p className="text-gray-500 text-xs tracking-widest mb-4">Estimated Survival Time ⏱️</p>
             <div className="text-5xl md:text-6xl font-bold">
               <span style={{ color: (data as any).survival?.color || '#00d4aa' }}>
                 {survivalCountdown.days}<span className="text-gray-500 text-3xl">d </span>
