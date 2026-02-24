@@ -387,7 +387,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Treasury Breakdown */}
+        {/* Combined Treasury Section */}
         <section className="bg-[#12121a] rounded-2xl border border-[#1a1a24] overflow-hidden">
           <div className="px-6 py-4 border-b border-[#1a1a24]">
             <div className="flex items-center justify-between">
@@ -403,34 +403,38 @@ export default function Home() {
             {/* Bittensor Wallet */}
             <div className="space-y-3">
               <h3 className="text-white font-medium flex items-center gap-2">
-                <span className="text-[#00d4aa]">●</span> Bittensor Wallet (τ)
+                <span className="text-[#00d4aa]">●</span> Bittensor Wallet
               </h3>
               <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24] space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Network:</span>
-                  <span className="text-gray-300">Finney Testnet</span>
+                  <span className="text-gray-400">Coldkey:</span>
+                  <code className="text-gray-300 font-mono text-xs">5CojToxGcszJEa9xwHWz1MgMb4Yij3GZevCqHB9hDLREXGKb</code>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Address:</span>
-                  <code className="text-gray-300 font-mono text-xs">{(data as any).treasury?.bittensor?.address || '5CojToxGcszJEa9xwHWz1MgMb4Yij3GZevCqHB9hDLREXGKb'}</code>
+                  <span className="text-gray-400">Hotkey:</span>
+                  <code className="text-gray-300 font-mono text-xs">5HSrzDmYiTRf1m4YqbznRS72wy9iD1EgnX7VUKawSQ7VSQx4</code>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Network:</span>
+                  <span className="text-[#00d4aa]">Finney</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Balance:</span>
-                  <span className="text-white font-medium">{((data as any).treasury?.bittensor?.balance || (data.treasury as any)?.tao || 0).toFixed(3)} τ (${((data as any).treasury?.bittensor?.usdValue || (data.treasury as any)?.taoUsd || 0).toFixed(2)})</span>
+                  <span className="text-white font-medium">{((data as any).treasury?.bittensor?.balance || (data.treasury as any)?.tao || 0).toFixed(3)} τ ${((data as any).treasury?.bittensor?.usdValue || (data.treasury as any)?.taoUsd || 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>
 
-            {/* Subnet Credits */}
+            {/* Subnet Account Balances */}
             <div className="space-y-3">
               <h3 className="text-white font-medium flex items-center gap-2">
-                <span className="text-[#7c3aed]">●</span> Subnet Credits
+                <span className="text-[#7c3aed]">●</span> Subnet Account Balances
               </h3>
               <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24] space-y-2">
                 {((data as any).treasury?.subnetCredits ? Object.entries((data as any).treasury.subnetCredits) : []).map(([key, subnet]: [string, any]) => (
                   <div key={key} className="flex justify-between text-sm">
                     <span className="text-gray-400">{subnet.name || key}:</span>
-                    <span className="text-white">{subnet.dailyUsd ? `$${subnet.dailyUsd.toFixed(2)}/day` : (subnet.status || 'N/A')}</span>
+                    <span className="text-white">${(subnet.usdValue || 0).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -439,16 +443,20 @@ export default function Home() {
             {/* Base Wallet */}
             <div className="space-y-3">
               <h3 className="text-white font-medium flex items-center gap-2">
-                <span className="text-[#627eea]">●</span> Base Wallet (EVM)
+                <span className="text-[#627eea]">●</span> Base Wallet
               </h3>
               <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24] space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Address:</span>
-                  <code className="text-gray-400 font-mono text-xs">{(data as any).treasury?.base?.address || 'Not deployed'}</code>
+                  <code className="text-gray-300 font-mono text-xs">{(data as any).treasury?.base?.address || '0xF6B3946a09B8368aeeD010B2b5ab945bC50328Ca'}</code>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Network:</span>
+                  <span className="text-[#627eea]">Base Mainnet</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">ETH:</span>
-                  <span className="text-white">{((data as any).treasury?.base?.eth?.balance || 0).toFixed(4)} ETH (${((data as any).treasury?.base?.eth?.usdValue || 0).toFixed(2)})</span>
+                  <span className="text-white">{((data as any).treasury?.base?.eth?.balance || 0).toFixed(4)} ETH ${((data as any).treasury?.base?.eth?.usdValue || 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">WETH Claimed:</span>
@@ -460,7 +468,44 @@ export default function Home() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">$CLAWNST:</span>
-                  <span className="text-gray-400">Not launched</span>
+                  <span className="text-gray-400">Not launched —</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Revenue Sources */}
+            <div className="space-y-3">
+              <h3 className="text-white font-medium flex items-center gap-2">
+                <span className="text-[#f97316]">●</span> Revenue Sources
+              </h3>
+              <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24] space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-[#00d4aa]"></div>
+                    <span className="text-gray-300">Creator Funding</span>
+                  </div>
+                  <span className="text-white font-medium">100%</span>
+                </div>
+                <div className="flex items-center justify-between opacity-50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-[#7c3aed]"></div>
+                    <span className="text-gray-400">$CLAWNST Trading Fees (Not launched)</span>
+                  </div>
+                  <span className="text-gray-400">0%</span>
+                </div>
+                <div className="flex items-center justify-between opacity-50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-[#627eea]"></div>
+                    <span className="text-gray-400">Subnet Mining (Not yet mining)</span>
+                  </div>
+                  <span className="text-gray-400">0%</span>
+                </div>
+                <div className="flex items-center justify-between opacity-50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-[#f97316]"></div>
+                    <span className="text-gray-400">Paid Services (Not yet offering)</span>
+                  </div>
+                  <span className="text-gray-400">0%</span>
                 </div>
               </div>
             </div>
@@ -631,104 +676,7 @@ export default function Home() {
             )}
           </div>
 
-          {/* Wallet Transparency */}
-          <div className="bg-[#12121a] rounded-2xl border border-[#1a1a24] overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#1a1a24]">
-              <div className="flex items-center gap-3">
-                <span>💰</span>
-                <h2 className="font-semibold">Wallet Transparency</h2>
-              </div>
-            </div>
-            <div className="p-6">
-              <div className="space-y-6">
-                {/* Bittensor Wallet */}
-                <div className="space-y-3">
-                  <h3 className="text-white font-medium">Bittensor (τ) Wallet</h3>
-                  <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24]">
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Coldkey:</span>
-                        <code className="text-gray-300 font-mono text-sm">5CojToxGcszJEa9xwHWz1MgMb4Yij3GZevCqHB9hDLREXGKb</code>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Hotkey:</span>
-                        <code className="text-gray-300 font-mono text-sm">5HSrzDmYiTRf1m4YqbznRS72wy9iD1EgnX7VUKawSQ7VSQx4</code>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Network:</span>
-                        <span className="text-[#00d4aa]">Finney Testnet</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Balance:</span>
-                        <span className="text-white font-medium">{(data.treasury as any).tao} τ (${(data.treasury as any).taoUsd} USD)</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Base Wallet (Future) */}
-                <div className="space-y-3">
-                  <h3 className="text-white font-medium">Base (WETH) Wallet</h3>
-                  <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24] opacity-70">
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Address:</span>
-                        <code className="text-gray-400 font-mono text-sm">Token not launched yet</code>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Network:</span>
-                        <span className="text-gray-400">Base Mainnet</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Balance:</span>
-                        <span className="text-gray-400 font-medium">{(data.treasury as any).weth} WETH (${(data.treasury as any).wethUsd} USD)</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Earnings Breakdown */}
-                <div className="space-y-3">
-                  <h3 className="text-white font-medium">Earnings Sources</h3>
-                  <div className="bg-[#0d0d12] p-4 rounded-lg border border-[#1a1a24]">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-[#00d4aa]"></div>
-                          <span className="text-gray-300">Creator Funding</span>
-                        </div>
-                        <span className="text-white font-medium">100%</span>
-                      </div>
-                      <div className="flex items-center justify-between opacity-50">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-[#7c3aed]"></div>
-                          <span className="text-gray-400">$CLAWNST Trading Fees</span>
-                        </div>
-                        <span className="text-gray-400">0% (Token not launched)</span>
-                      </div>
-                      <div className="flex items-center justify-between opacity-50">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-[#627eea]"></div>
-                          <span className="text-gray-400">Subnet Mining</span>
-                        </div>
-                        <span className="text-gray-400">0% (Not yet mining)</span>
-                      </div>
-                      <div className="flex items-center justify-between opacity-50">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-[#f97316]"></div>
-                          <span className="text-gray-400">Paid Services</span>
-                        </div>
-                        <span className="text-gray-400">0% (Not yet offering)</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Upgrade History */}
+          {/* Upgrade History */}
         <section className="bg-[#12121a] rounded-2xl border border-[#1a1a24] overflow-hidden">
           <div className="px-6 py-4 border-b border-[#1a1a24]">
             <div className="flex items-center gap-3">
