@@ -100,7 +100,7 @@ export default function Home() {
   const [survivalCountdown, setSurvivalCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [survivalTime, setSurvivalTime] = useState(0); // Total seconds remaining
   const [loading, setLoading] = useState(true);
-  const [tauPrice, setTauPrice] = useState(120);
+  const [tauPrice, setTauPrice] = useState(170); // Default to current market price
   const [tauBalance, setTauBalance] = useState(1.126); // Live τ balance
   const [dayNumber, setDayNumber] = useState(2); // Auto-calculated from launch date
   const [accordionOpen, setAccordionOpen] = useState<Record<string, boolean>>({
@@ -144,8 +144,23 @@ export default function Home() {
     }
     fetchState();
     
-    // Fetch live TAO price from Taostats API
+    // Fetch live TAO price - try multiple sources
     async function fetchTauPrice() {
+      // Try CoinGecko first
+      try {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tao&vs_currencies=usd');
+        if (res.ok) {
+          const json = await res.json();
+          if (json?.tao?.usd) {
+            setTauPrice(json.tao.usd);
+            return;
+          }
+        }
+      } catch (e) {
+        console.log('CoinGecko failed, trying alternatives');
+      }
+      
+      // Try Taostats as fallback
       try {
         const res = await fetch('https://api.taostats.io/api/price/history?symbol=tao&interval=1d', {
           headers: { 'Authorization': 'tao-58f0e439-1074-48e1-8319-3838250d3c07:d112bf3e' }
@@ -157,7 +172,8 @@ export default function Home() {
           }
         }
       } catch (e) {
-        console.log('Using default TAO price');
+        // Keep default if all fail
+        setTauPrice(170); // Current market price ~$170
       }
     }
     
