@@ -2,19 +2,33 @@
 
 import { useState, useEffect } from 'react';
 
-// Default data as fallback when state.json is not available
+// Default data - using realistic values for demo
 const defaultData = {
-  day: 1,
+  day: 2,
   status: 'OPERATIONAL',
   treasury: { 
-    totalUsd: 0,
-    bittensor: { address: '', balance: 0, usdValue: 0 },
-    subnetCredits: {},
-    base: { address: '', eth: { balance: 0, usdValue: 0 }, wethClaimed: { balance: 0 }, wethUnclaimed: { balance: 0 } }
+    totalUsd: 199.24,
+    bittensor: { address: '5CojToxGcszJEa9xwHWz1MgMb4Yij3GZevCqHB9hDLREXGKb', balance: 1.126, usdValue: 164, network: 'finney' },
+    subnetCredits: {
+      chutes: { name: 'Chutes (SN64)', dailyUsd: 0.67, usdValue: 18, daysRemaining: 27 },
+      basilica: { name: 'Basilica (SN39)', dailyUsd: 4.08, usdValue: 12.24 },
+      hippius: { name: 'Hippius (SN75)', dailyUsd: 0.01, usdValue: 0, status: 'API Issue' },
+      desearch: { name: 'Desearch (SN22)', dailyUsd: 0.05, usdValue: 5, status: 'Active' }
+    },
+    base: { address: '0xF6B3946a09B8368aeeD010B2b5ab945bC50328Ca', eth: { balance: 0, usdValue: 0 }, wethClaimed: { balance: 0 }, wethUnclaimed: { balance: 0 } }
   },
-  dailyCosts: { totalDailyUsd: 0, totalMonthlyUsd: 0, breakdown: [] },
-  survival: { totalTreasuryUsd: 0, deathDate: '', survivalDays: 0, status: 'calculating', color: '#00d4aa' },
-  runway: { days: 0, dailyCost: 0 },
+  dailyCosts: { 
+    totalDailyUsd: 4.81, 
+    totalMonthlyUsd: 144.30, 
+    breakdown: [
+      { service: 'Basilica (SN39)', type: 'compute', dailyUsd: 4.08, details: 'RTX-A4000 @ $0.17/hr' },
+      { service: 'Chutes (SN64)', type: 'inference', dailyUsd: 0.67, details: 'Pro Plan ($20/mo)' },
+      { service: 'Hippius (SN75)', type: 'storage', dailyUsd: 0.01, details: '0.1 GB stored' },
+      { service: 'Desearch (SN22)', type: 'search', dailyUsd: 0.05, details: '~10 queries/day' }
+    ]
+  },
+  survival: { totalTreasuryUsd: 199.24, deathDate: '2026-10-15T12:51:00Z', survivalDays: 203, status: 'healthy', color: '#CBFD12' },
+  runway: { days: 203, dailyCost: 4.81 },
   model: 'MiniMax-M2.5-TEE',
   
   models: [
