@@ -116,12 +116,12 @@ export default function Home() {
   useEffect(() => {
     const timer = setInterval(() => {
       setHeartbeat(prev => {
-        const interval = data.heartbeat?.intervalSeconds || 1800;
+        const interval = (data as any).heartbeat?.intervalSeconds || 1800;
         return prev > 0 ? prev - 1 : interval;
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [data]);
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] text-white">
