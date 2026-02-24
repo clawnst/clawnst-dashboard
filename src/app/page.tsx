@@ -283,16 +283,45 @@ export default function Home() {
         
         {/* Dashboard Stats - Updated to match site styling */}
         <section className="space-y-6">
-          {/* 1. Big Runway Timer (full width, top) */}
+          {/* 1. Big Runway Timer (full width, top) - calculate directly */}
           <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-8 text-center">
             <p className="text-gray-500 text-xs tracking-widest mb-4">Estimated Survival Time ⏱️</p>
             <div className="text-5xl md:text-6xl font-bold">
-              <span style={{ color: (data as any).survival?.color || '#00d4aa' }}>
-                {survivalCountdown.days}<span className="text-gray-500 text-3xl">d </span>
-                {survivalCountdown.hours.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">h </span>
-                {survivalCountdown.minutes.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">m </span>
-                {survivalCountdown.seconds.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">s</span>
-              </span>
+              {(() => {
+                const survivalData = (data as any).survival;
+                let deathDate: Date;
+                
+                // Get death date from survival data
+                if (survivalData?.deathDate) {
+                  deathDate = new Date(survivalData.deathDate);
+                } else {
+                  // Fallback: calculate from treasury and daily costs
+                  const treasury = (data as any).treasury;
+                  const dailyCosts = (data as any).dailyCosts;
+                  const tauBalance = treasury?.bittensor?.balance || 1.126;
+                  const tauPriceVal = tauPrice || 120;
+                  const treasuryUsd = tauBalance * tauPriceVal;
+                  const dailyBurn = dailyCosts?.totalDailyUsd || 4.81;
+                  const daysRemaining = treasuryUsd / dailyBurn;
+                  deathDate = new Date(Date.now() + daysRemaining * 24 * 60 * 60 * 1000);
+                }
+                
+                const now = new Date();
+                const diff = Math.max(0, deathDate.getTime() - now.getTime());
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                return (
+                  <span style={{ color: survivalData?.color || '#00d4aa' }}>
+                    {days}<span className="text-gray-500 text-3xl">d </span>
+                    {hours.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">h </span>
+                    {minutes.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">m </span>
+                    {seconds.toString().padStart(2, '0')}<span className="text-gray-500 text-3xl">s</span>
+                  </span>
+                );
+              })()}
             </div>
             <p className="text-gray-500 text-sm mt-4">
               Death: {new Date((data as any).survival?.deathDate || Date.now()).toLocaleDateString()} • 
