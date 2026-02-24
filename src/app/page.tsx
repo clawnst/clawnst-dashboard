@@ -224,45 +224,54 @@ export default function Home() {
 
   // Survival countdown - updates every second
   useEffect(() => {
+    let deathDateSet = false;
+    let cachedDeathDate: number;
+    
     const updateSurvival = () => {
       const treasury = (data as any).treasury;
       const dailyCosts = (data as any).dailyCosts;
       const tauPriceVal = tauPrice || 120;
-      const ethPriceVal = 3500; // Could fetch live
+      const ethPriceVal = 3500;
       
-      // 1. τ in wallet (live from Taostats)
-      const tauInWallet = tauBalance;
+      // Only calculate death date once (or when treasury changes significantly)
+      if (!deathDateSet) {
+        // 1. τ in wallet (live from Taostats)
+        const tauInWallet = tauBalance;
+        
+        // 2. Subnet credits (convert USD to τ)
+        const subnetCredits = treasury?.subnetCredits || {};
+        let subnetCreditsUsd = 0;
+        Object.values(subnetCredits).forEach((s: any) => {
+          subnetCreditsUsd += (s.usdValue || 0);
+        });
+        const subnetCreditsTau = subnetCreditsUsd / tauPriceVal;
+        
+        // 3. Base wallet ETH/WETH
+        const base = treasury?.base || {};
+        const ethBalance = base?.eth?.balance || 0;
+        const wethClaimed = base?.wethClaimed?.balance || 0;
+        const wethUnclaimed = base?.wethUnclaimed?.balance || 0;
+        const baseWalletUsd = (ethBalance + wethClaimed + wethUnclaimed) * ethPriceVal;
+        
+        // Total Treasury USD
+        const totalTau = tauInWallet + subnetCreditsTau;
+        const totalTauUsd = totalTau * tauPriceVal;
+        const totalTreasuryUsd = totalTauUsd + baseWalletUsd;
+        
+        // Daily burn
+        const dailyBurn = dailyCosts?.totalDailyUsd || 4.81;
+        
+        // Survival days and death date
+        const daysRemaining = dailyBurn > 0 ? totalTreasuryUsd / dailyBurn : 0;
+        cachedDeathDate = Date.now() + daysRemaining * 24 * 60 * 60 * 1000;
+        deathDateSet = true;
+      }
       
-      // 2. Subnet credits (convert USD to τ)
-      const subnetCredits = treasury?.subnetCredits || {};
-      let subnetCreditsUsd = 0;
-      Object.values(subnetCredits).forEach((s: any) => {
-        subnetCreditsUsd += (s.usdValue || 0);
-      });
-      const subnetCreditsTau = subnetCreditsUsd / tauPriceVal;
+      // Count down to death date
+      const now = Date.now();
+      const diff = Math.max(0, cachedDeathDate - now);
+      const totalSeconds = Math.floor(diff / 1000);
       
-      // 3. Base wallet ETH/WETH (hardcoded for now, would need live query)
-      const base = treasury?.base || {};
-      const ethBalance = base?.eth?.balance || 0;
-      const wethClaimed = base?.wethClaimed?.balance || 0;
-      const wethUnclaimed = base?.wethUnclaimed?.balance || 0;
-      const baseWalletUsd = (ethBalance + wethClaimed + wethUnclaimed) * ethPriceVal;
-      
-      // Total τ (wallet + subnet)
-      const totalTau = tauInWallet + subnetCreditsTau;
-      const totalTauUsd = totalTau * tauPriceVal;
-      
-      // Total Treasury USD
-      const totalTreasuryUsd = totalTauUsd + baseWalletUsd;
-      
-      // Daily burn
-      const dailyBurn = dailyCosts?.totalDailyUsd || 4.81;
-      
-      // Survival days
-      const daysRemaining = dailyBurn > 0 ? totalTreasuryUsd / dailyBurn : 0;
-      
-      // Convert to countdown
-      const totalSeconds = Math.floor(daysRemaining * 24 * 60 * 60);
       setSurvivalTime(totalSeconds);
       
       const days = Math.floor(totalSeconds / (24 * 60 * 60));
