@@ -287,13 +287,25 @@ export default function Home() {
               <p className="text-gray-500 text-sm mt-1">of autonomous operation</p>
             </div>
             
-            {/* TREASURY - Total τ */}
+            {/* TREASURY - Total τ (wallet + subnet credits) */}
             <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
               <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">TREASURY</p>
               <p className="text-5xl font-bold text-white">
-                {((data as any).treasury?.bittensor?.balance || data.treasury?.tao || 0).toFixed(3)} <span className="text-2xl text-[#00d4aa]">τ</span>
+                {(() => {
+                  // Calculate total τ = wallet τ + subnet credits (converted from USD)
+                  const walletTau = (data as any).treasury?.bittensor?.balance || data.treasury?.tao || 0;
+                  const subnetCredits = (data as any).treasury?.subnetCredits || {};
+                  const tauPriceUsd = 146; // Approximate τ price
+                  let subnetTau = 0;
+                  Object.values(subnetCredits).forEach((s: any) => {
+                    subnetTau += (s.usdValue || 0) / tauPriceUsd;
+                  });
+                  const totalTau = walletTau + subnetTau;
+                  return totalTau.toFixed(3);
+                })()} <span className="text-2xl text-[#00d4aa]">τ</span>
               </p>
-              <p className="text-gray-500 text-sm mt-1">${((data as any).treasury?.bittensor?.usdValue || data.treasury?.taoUsd || 0).toFixed(0)} USD</p>
+              <p className="text-gray-500 text-sm mt-1">${((data as any).treasury?.totalUsd || (data as any).survival?.totalTreasuryUsd || data.treasury?.taoUsd || 0).toFixed(0)} USD</p>
+              <p className="text-gray-600 text-xs mt-1">(wallet + subnet credits)</p>
             </div>
             
             {/* HOLDERS */}
