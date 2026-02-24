@@ -148,9 +148,22 @@ export default function Home() {
   useEffect(() => {
     const calculateCountdown = () => {
       const survivalData = (data as any).survival;
-      if (!survivalData?.deathDate) return;
+      const treasury = (data as any).treasury;
+      const dailyCosts = (data as any).dailyCosts;
       
-      const deathDate = new Date(survivalData.deathDate);
+      let deathDate: Date;
+      
+      // Try to get death date from survival data, or calculate from treasury
+      if (survivalData?.deathDate) {
+        deathDate = new Date(survivalData.deathDate);
+      } else {
+        // Calculate: treasury USD / daily costs = days remaining
+        const treasuryUsd = treasury?.totalUsd || treasury?.bittensor?.usdValue || data.treasury?.taoUsd || 0;
+        const dailyBurn = dailyCosts?.totalDailyUsd || data.runway?.dailyCost || 4.81;
+        const daysRemaining = treasuryUsd > 0 && dailyBurn > 0 ? treasuryUsd / dailyBurn : 0;
+        deathDate = new Date(Date.now() + daysRemaining * 24 * 60 * 60 * 1000);
+      }
+      
       const now = new Date();
       const diff = deathDate.getTime() - now.getTime();
       
@@ -274,6 +287,15 @@ export default function Home() {
               <p className="text-gray-500 text-sm mt-1">of autonomous operation</p>
             </div>
             
+            {/* TREASURY - Total τ */}
+            <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
+              <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">TREASURY</p>
+              <p className="text-5xl font-bold text-white">
+                {((data as any).treasury?.bittensor?.balance || data.treasury?.tao || 0).toFixed(3)} <span className="text-2xl text-[#00d4aa]">τ</span>
+              </p>
+              <p className="text-gray-500 text-sm mt-1">${((data as any).treasury?.bittensor?.usdValue || data.treasury?.taoUsd || 0).toFixed(0)} USD</p>
+            </div>
+            
             {/* HOLDERS */}
             <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
               <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">HOLDERS</p>
@@ -281,20 +303,11 @@ export default function Home() {
               <p className="text-gray-500 text-sm mt-1">Token not launched</p>
             </div>
             
-            {/* UNCLAIMED FEES */}
-            <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
-              <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">UNCLAIMED FEES</p>
-              <p className="text-4xl font-bold text-white">
-                {((data as any).treasury?.base?.wethUnclaimed?.balance || 0).toFixed(3)} <span className="text-lg text-[#627eea]">Ξ</span>
-              </p>
-              <p className="text-gray-500 text-sm mt-1">WETH on Base</p>
-            </div>
-            
             {/* DAILY BURN */}
             <div className="bg-gradient-to-br from-[#12121a] to-[#0d0d12] rounded-2xl border border-[#1a1a24] p-6 text-center">
               <p className="text-gray-500 text-xs uppercase tracking-widest mb-2">DAILY BURN</p>
               <p className="text-4xl font-bold text-white">
-                ${((data as any).dailyCosts?.totalDailyUsd || 0).toFixed(2)}
+                ${((data as any).dailyCosts?.totalDailyUsd || data.runway?.dailyCost || 0).toFixed(2)}
               </p>
               <p className="text-gray-500 text-sm mt-1">per day</p>
             </div>
